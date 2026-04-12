@@ -4,9 +4,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Button } from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/ErrorState";
-import { Modal } from "@/components/ui/Modal";
 import { getAdminMetrics } from "@/lib/api/admin";
 import { formatCurrency } from "@/lib/utils";
 
@@ -29,15 +27,6 @@ interface RevenueMonth {
 }
 
 const quickRanges = ["7d", "30d", "90d", "1y"];
-
-const revenueByMonth: RevenueMonth[] = [
-  { month: "Jan", revenue: 4200 },
-  { month: "Feb", revenue: 5100 },
-  { month: "Mar", revenue: 4700 },
-  { month: "Apr", revenue: 6200 },
-  { month: "May", revenue: 6900 },
-  { month: "Jun", revenue: 7600 },
-];
 
 function formatDateInput(date: Date) {
   return date.toISOString().split("T")[0];
@@ -108,9 +97,9 @@ export function AdminDashboardClient() {
     enrollmentsCount: number;
     averageRating: string;
     totalRevenue: number;
+    revenueByMonth: RevenueMonth[];
   } | null>(null);
   const [metricsError, setMetricsError] = useState<string | null>(null);
-  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
   const [activeRange, setActiveRange] = useState("30d");
   const [fromDate, setFromDate] = useState("2026-03-06");
   const [toDate, setToDate] = useState("2026-04-05");
@@ -179,12 +168,11 @@ export function AdminDashboardClient() {
     },
   ];
 
-  const maxRevenue = Math.max(...revenueByMonth.map((item) => item.revenue));
+  const revenueByMonth = metrics?.revenueByMonth ?? [];
+  const maxRevenue = Math.max(1, ...revenueByMonth.map((item) => item.revenue));
   const firstRevenue = revenueByMonth[0]?.revenue ?? 0;
   const latestRevenue = revenueByMonth[revenueByMonth.length - 1]?.revenue ?? 0;
-  const revenueGrowth = firstRevenue
-    ? Math.round(((latestRevenue - firstRevenue) / firstRevenue) * 100)
-    : 0;
+  const revenueGrowth = firstRevenue ? Math.round(((latestRevenue - firstRevenue) / firstRevenue) * 100) : 0;
 
   function applyQuickRange(range: string) {
     const endDate = new Date(toDate);
@@ -330,29 +318,12 @@ export function AdminDashboardClient() {
               Track how revenue changes across the latest months and compare momentum over time.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.18em] text-emerald-200">
-                Growth
-              </p>
-              <p className="mt-1 text-2xl font-black text-emerald-300">
-                {revenueGrowth >= 0 ? `+${revenueGrowth}%` : `${revenueGrowth}%`}
-              </p>
-            </div>
-            <Button
-              variant="secondary"
-              onClick={() => setIsSummaryModalOpen(true)}
-              className="border-white/10 bg-white/8 text-sky-200 shadow-[0_14px_30px_-20px_rgba(14,165,233,0.16)] hover:border-sky-300/30 hover:bg-sky-400/10 hover:text-white"
-            >
-              Open summary
-            </Button>
-          </div>
         </div>
 
         <div className="dashboard-card mt-10 rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(30,41,59,0.74))] p-6 shadow-[0_18px_34px_-28px_rgba(2,8,23,0.5)]">
           <div className="mb-6 flex items-center justify-between text-sm text-slate-300">
             <span>Revenue by month</span>
-            <span>Last 6 months</span>
+            <span>Last {revenueByMonth.length || 6} months</span>
           </div>
 
           <div className="grid h-[360px] grid-cols-[64px_1fr] gap-4">
@@ -408,25 +379,6 @@ export function AdminDashboardClient() {
           </div>
         </div>
       </div>
-
-      <Modal
-        open={isSummaryModalOpen}
-        title="Admin summary"
-        description="High-level platform health for the admin."
-        onClose={() => setIsSummaryModalOpen(false)}
-      >
-        <div className="space-y-4 text-sm leading-7 text-slate-600">
-          <p>
-            {metrics?.courseCount ?? 0} courses are currently visible with{" "}
-            {metrics?.studentsCount ?? 0} total student
-            enrollments.
-          </p>
-          <p>
-            The platform average rating is {metrics?.averageRating ?? "0"}.
-          </p>
-          <p>Total enrollments tracked: {metrics?.enrollmentsCount ?? 0}.</p>
-        </div>
-      </Modal>
     </AdminLayout>
   );
 }

@@ -43,3 +43,15 @@ export async function getMe(token: string) {
   });
   return response.user;
 }
+
+export async function updateMe(
+  payload: { email?: string; firstName?: string; lastName?: string },
+  token: string,
+) {
+  const response = await apiRequest<{ user: AuthUser }>("/api/auth/me", {
+    method: "PATCH",
+    body: payload,
+    token,
+  });
+  return response.user;
+}

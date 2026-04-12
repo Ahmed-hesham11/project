@@ -42,3 +42,13 @@ export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 });
+
+export const updateMeSchema = z
+  .object({
+    email: z.string().email().optional(),
+    firstName: z.string().min(1).optional(),
+    lastName: z.string().min(1).optional(),
+  })
+  .refine((values) => Object.keys(values).length > 0, {
+    message: "At least one field is required",
+  });

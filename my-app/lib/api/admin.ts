@@ -10,6 +10,7 @@ export async function getAdminMetrics(token: string) {
       enrollmentsCount: number;
       averageRating: string;
       totalRevenue: number;
+      revenueByMonth: Array<{ month: string; revenue: number }>;
     };
   }>("/api/admin/dashboard/metrics", { token });
   return response.metrics;

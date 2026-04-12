@@ -1,15 +1,15 @@
-import { CourseCard } from "@/components/courses/CourseCard";
 import { getCourses } from "@/lib/api/courses";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Course } from "@/types/course";
+import { CurrentCoursesFilterClient } from "@/components/sections/CurrentCoursesFilterClient";
 
 export async function MathCurrentCourses() {
   let featuredCourses: Course[] = [];
   let errorMessage: string | null = null;
 
   try {
-    featuredCourses = await getCourses(true);
+    featuredCourses = await getCourses();
   } catch (error) {
     errorMessage = error instanceof Error ? error.message : "Failed to load courses";
   }
@@ -37,17 +37,7 @@ export async function MathCurrentCourses() {
           </div>
         ) : null}
         {!errorMessage && featuredCourses.length ? (
-          <div className="mt-10 grid gap-6 xl:grid-cols-3">
-            {featuredCourses.map((course, index) => (
-              <div
-                key={course.id}
-                className="section-reveal"
-                style={{ animationDelay: `${index * 110}ms` }}
-              >
-                <CourseCard course={course} />
-              </div>
-            ))}
-          </div>
+          <CurrentCoursesFilterClient courses={featuredCourses} />
         ) : null}
       </div>
     </section>

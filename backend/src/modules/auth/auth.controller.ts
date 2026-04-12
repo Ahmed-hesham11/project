@@ -42,3 +42,59 @@ export async function meHandler(req: Request, res: Response, next: NextFunction)
     return next(error);
   }
 }
+
+export async function updateMeHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const authUser = req.user;
+    if (!authUser) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const payload = req.body as {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+    };
+
+    const existingUser = await prisma.user.findUnique({
+      where: { id: authUser.id },
+      select: { id: true, profile: true },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const shouldUpdateProfileNames =
+      (typeof payload.firstName === "string" || typeof payload.lastName === "string") &&
+      Boolean(existingUser.profile);
+
+    const updatedUser = await prisma.user.update({
+      where: { id: authUser.id },
+      data: {
+        ...(typeof payload.email === "string" ? { email: payload.email } : {}),
+        ...(shouldUpdateProfileNames
+          ? {
+              profile: {
+                update: {
+                  ...(typeof payload.firstName === "string" ? { firstName: payload.firstName } : {}),
+                  ...(typeof payload.lastName === "string" ? { lastName: payload.lastName } : {}),
+                },
+              },
+            }
+          : {}),
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        profile: true,
+        adminProfile: true,
+      },
+    });
+
+    return res.status(200).json({ user: updatedUser });
+  } catch (error) {
+    return next(error);
+  }
+}
