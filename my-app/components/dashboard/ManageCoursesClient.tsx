@@ -118,6 +118,18 @@ export function ManageCoursesClient() {
     );
   }
 
+  function toggleFreeCourse() {
+    setDraft((currentDraft) => {
+      if (!currentDraft) return currentDraft;
+      const nextIsFree = !currentDraft.isFree;
+      return {
+        ...currentDraft,
+        isFree: nextIsFree,
+        price: nextIsFree ? "0" : currentDraft.price,
+      };
+    });
+  }
+
   function handleUploadImage(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -157,6 +169,11 @@ export function ManageCoursesClient() {
     }
 
     const parsedPrice = Number(draft.price);
+    const effectivePrice = draft.isFree
+      ? 0
+      : Number.isFinite(parsedPrice)
+        ? parsedPrice
+        : 0;
     const levelMap = {
       Beginner: "BEGINNER",
       Intermediate: "INTERMEDIATE",
@@ -173,7 +190,7 @@ export function ManageCoursesClient() {
         {
           title: draft.title.trim(),
           tagline: draft.description.trim(),
-          price: draft.isFree ? 0 : Number.isFinite(parsedPrice) ? parsedPrice : undefined,
+          price: effectivePrice,
           level: levelMap[draft.level],
         },
         token,
@@ -186,7 +203,7 @@ export function ManageCoursesClient() {
                 ...course,
                 title: draft.title.trim() || course.title,
                 tagline: draft.description.trim() || course.tagline,
-                price: draft.isFree ? 0 : Number.isFinite(parsedPrice) ? parsedPrice : course.price,
+                price: effectivePrice,
                 level: draft.level,
                 image: draft.image || course.image,
               }
@@ -215,7 +232,7 @@ export function ManageCoursesClient() {
           lessonsCount: 0,
           students: 0,
           rating: 0,
-          price: draft.isFree ? 0 : Number(parsedPrice || 0),
+          price: effectivePrice,
           image: draft.image || "/images/logo.jpg",
           featured: false,
           mentorId,
@@ -363,14 +380,14 @@ export function ManageCoursesClient() {
               <span>Is Free</span>
               <button
                 type="button"
-                onClick={() => updateDraft("isFree", !draft.isFree)}
-                className={`relative inline-flex h-7 w-12 items-center rounded-full transition ${
+                onClick={toggleFreeCourse}
+                className={`relative inline-flex h-7 w-12 items-center overflow-hidden rounded-full transition ${
                   draft.isFree ? "bg-emerald-500" : "bg-slate-500"
                 }`}
               >
                 <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                    draft.isFree ? "translate-x-6" : "translate-x-1"
+                  className={`absolute left-1 inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                    draft.isFree ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
@@ -384,6 +401,7 @@ export function ManageCoursesClient() {
               disabled={draft.isFree}
               onChange={(event) => updateDraft("price", event.target.value)}
             />
+            {draft.isFree ? <p className="text-xs text-emerald-300">السعر تم ضبطه تلقائيا إلى 0 لأن الكورس مجاني.</p> : null}
 
             <label className="grid gap-2 text-sm text-slate-300">
               <span className="font-medium text-white">Upload image</span>

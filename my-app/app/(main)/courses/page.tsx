@@ -1,4 +1,4 @@
-import { CourseGrid } from "@/components/courses/CourseGrid";
+import { CoursesGridClient } from "@/components/courses/CoursesGridClient";
 import { getCourses } from "@/lib/api/courses";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Course } from "@/types/course";
@@ -27,7 +27,7 @@ export default async function CoursesPage() {
           {errorMessage ? (
             <ErrorState title="تعذر تحميل الكورسات" description={errorMessage} />
           ) : (
-            <CourseGrid courses={courses} />
+            <CoursesGridClient courses={courses} />
           )}
         </div>
       </div>

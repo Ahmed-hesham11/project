@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { enrollInCourse } from "@/lib/api/enrollments";
 import { createPaymentRequest } from "@/lib/api/lms";
-import { formatCurrency } from "@/lib/utils";
+import { formatCoursePrice } from "@/lib/utils";
 import { Course } from "@/types/course";
 
 interface CourseDetailsProps {
@@ -39,7 +39,7 @@ export function CourseDetails({ course }: CourseDetailsProps) {
     setEnrollError(null);
     try {
       await enrollInCourse(course.id, token);
-      router.push("/my-courses");
+      router.push(`/courses/${course.id}/learn`);
     } catch (error) {
       setEnrollError(error instanceof Error ? error.message : "Enrollment failed");
     } finally {
@@ -140,7 +140,7 @@ export function CourseDetails({ course }: CourseDetailsProps) {
               سجل الآن
             </p>
             <p className="text-4xl font-black text-white" dir="ltr">
-              {formatCurrency(course.price)}
+              {formatCoursePrice(course.price)}
             </p>
             <p className="text-sm leading-7 text-slate-300">
               اشترك الآن للوصول لكل الدروس والاختبارات والمحتوى الكامل للكورس.
@@ -150,7 +150,7 @@ export function CourseDetails({ course }: CourseDetailsProps) {
               disabled={enrolling}
               className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-[linear-gradient(to_right,_var(--primary),_var(--secondary))] px-8 text-base font-medium text-white"
             >
-              {enrolling ? "جاري الاشتراك..." : "ابدأ هذا الكورس"}
+              {enrolling ? "جاري التسجيل..." : "سجل الان"}
             </button>
             <label className="grid gap-2 text-sm text-slate-300">
               <span>طريقة الدفع</span>

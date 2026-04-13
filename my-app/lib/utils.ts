@@ -10,6 +10,10 @@ export function formatCurrency(value: number) {
   return `${formattedNumber} ج.م`;
 }
 
+export function formatCoursePrice(value: number) {
+  return value <= 0 ? "مجاني" : formatCurrency(value);
+}
+
 export function getInitials(name: string) {
   return name
     .split(" ")

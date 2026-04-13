@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { BarChart3, Pencil, Plus, Users, Video } from "lucide-react";
+import { Pencil, Plus, Video } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -12,14 +12,13 @@ import { ErrorState } from "@/components/ui/ErrorState";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { getAdminCourses } from "@/lib/api/admin";
+import { createLesson, createModule } from "@/lib/api/lms";
 import { formatCurrency } from "@/lib/utils";
 import { Course, CourseLesson, CourseModule } from "@/types/course";
 
 interface CourseDetailsAdminClientProps {
   courseId: string;
 }
-
-type ActiveTab = "chapters" | "students" | "analytics";
 
 interface LessonDraft {
   moduleId: string;
@@ -46,22 +45,27 @@ export function CourseDetailsAdminClient({ courseId }: CourseDetailsAdminClientP
   const { token } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<CourseModule[]>([]);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("chapters");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [lessonDraft, setLessonDraft] = useState<LessonDraft | null>(null);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [quizDraft, setQuizDraft] = useState<QuizDraft | null>(null);
+  const [isSavingLesson, setIsSavingLesson] = useState(false);
+  const [isSavingChapter, setIsSavingChapter] = useState(false);
+
+  async function reloadCourseDetails(authToken: string) {
+    const courses = await getAdminCourses(authToken);
+    const selected = courses.find((item) => item.id === courseId || item.slug === courseId) ?? null;
+    setCourse(selected);
+    setModules(selected?.modules ?? []);
+  }
 
   useEffect(() => {
     if (!token) return;
     (async () => {
       try {
-        const courses = await getAdminCourses(token);
-        const selected = courses.find((item) => item.id === courseId || item.slug === courseId) ?? null;
-        setCourse(selected);
-        setModules(selected?.modules ?? []);
+        await reloadCourseDetails(token);
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "Failed to load course details");
       } finally {
@@ -75,14 +79,28 @@ export function CourseDetailsAdminClient({ courseId }: CourseDetailsAdminClientP
     [modules],
   );
 
-  function handleAddChapter() {
+  async function handleAddChapter() {
+    if (!token || !course) return;
+
     const chapterNumber = modules.length + 1;
-    const newModule: CourseModule = {
-      id: `chapter-${Date.now()}`,
-      title: `New Chapter ${chapterNumber}`,
-      lessons: [],
-    };
-    setModules((current) => [...current, newModule]);
+    setIsSavingChapter(true);
+    setError(null);
+
+    try {
+      await createModule(
+        {
+          courseId: course.id,
+          title: `New Chapter ${chapterNumber}`,
+          sortOrder: chapterNumber,
+        },
+        token,
+      );
+      await reloadCourseDetails(token);
+    } catch (createError) {
+      setError(createError instanceof Error ? createError.message : "Failed to create chapter");
+    } finally {
+      setIsSavingChapter(false);
+    }
   }
 
   function handleOpenLessonModal(moduleId: string) {
@@ -96,31 +114,41 @@ export function CourseDetailsAdminClient({ courseId }: CourseDetailsAdminClientP
     setIsLessonModalOpen(true);
   }
 
-  function handleSaveLesson() {
+  async function handleSaveLesson() {
     if (!lessonDraft?.title.trim()) {
       setError("Lesson title is required");
       return;
     }
+    if (!token) {
+      setError("You must be logged in");
+      return;
+    }
 
-    const newLesson: CourseLesson = {
-      id: `lesson-${Date.now()}`,
-      title: lessonDraft.title.trim(),
-      duration: lessonDraft.videoUrl.trim() ? "Video" : "Draft",
-      locked: !lessonDraft.isFree,
-    };
+    setIsSavingLesson(true);
+    setError(null);
 
-    setModules((current) =>
-      current.map((module) =>
-        module.id === lessonDraft.moduleId
-          ? {
-              ...module,
-              lessons: [...module.lessons, newLesson],
-            }
-          : module,
-      ),
-    );
-    setIsLessonModalOpen(false);
-    setLessonDraft(null);
+    try {
+      await createLesson(
+        {
+          moduleId: lessonDraft.moduleId,
+          title: lessonDraft.title.trim(),
+          description: "",
+          videoUrl: lessonDraft.videoUrl.trim() || undefined,
+          duration: lessonDraft.videoUrl.trim() ? "Video" : "0 دقيقة",
+          sortOrder: Number(lessonDraft.orderIndex) > 0 ? Number(lessonDraft.orderIndex) : 1,
+          isLocked: !lessonDraft.isFree,
+        },
+        token,
+      );
+
+      await reloadCourseDetails(token);
+      setIsLessonModalOpen(false);
+      setLessonDraft(null);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Failed to save lesson");
+    } finally {
+      setIsSavingLesson(false);
+    }
   }
 
   function handleOpenQuizModal(lessonId: string) {
@@ -239,64 +267,14 @@ export function CourseDetailsAdminClient({ courseId }: CourseDetailsAdminClientP
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200/70 bg-white p-2 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
-        <div className="flex flex-wrap gap-2">
-          {[
-            { id: "chapters", label: "Chapters", icon: <Video className="h-4 w-4" /> },
-            { id: "students", label: "Students", icon: <Users className="h-4 w-4" /> },
-            { id: "analytics", label: "Analytics", icon: <BarChart3 className="h-4 w-4" /> },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id as ActiveTab)}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition ${
-                activeTab === tab.id
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                  : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {activeTab === "chapters" ? (
-        <ChapterTree
-          modules={modules}
-          onAddChapter={handleAddChapter}
-          onAddLesson={handleOpenLessonModal}
-          onAddQuiz={handleOpenQuizModal}
-          onReorderLessons={handleReorderLessons}
-        />
-      ) : null}
-
-      {activeTab === "students" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Students</h3>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            {course.students} students are currently enrolled in this course.
-          </p>
-        </div>
-      ) : null}
-
-      {activeTab === "analytics" ? (
-        <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Analytics</h3>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
-              <p className="text-xs text-slate-500 dark:text-slate-400">Completion Trend</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">78%</p>
-            </div>
-            <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
-              <p className="text-xs text-slate-500 dark:text-slate-400">Monthly Revenue</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">{formatCurrency(course.students * course.price)}</p>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <ChapterTree
+        modules={modules}
+        onAddChapter={handleAddChapter}
+        onAddLesson={handleOpenLessonModal}
+        onAddQuiz={handleOpenQuizModal}
+        onReorderLessons={handleReorderLessons}
+      />
+      {isSavingChapter ? <p className="text-sm text-slate-300">Creating chapter...</p> : null}
 
       <Modal
         open={isLessonModalOpen && Boolean(lessonDraft)}
@@ -328,13 +306,13 @@ export function CourseDetailsAdminClient({ courseId }: CourseDetailsAdminClientP
               <button
                 type="button"
                 onClick={() => setLessonDraft({ ...lessonDraft, isFree: !lessonDraft.isFree })}
-                className={`relative inline-flex h-7 w-12 items-center rounded-full transition ${
+                className={`relative inline-flex h-7 w-12 items-center overflow-hidden rounded-full transition ${
                   lessonDraft.isFree ? "bg-emerald-500" : "bg-slate-500"
                 }`}
               >
                 <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                    lessonDraft.isFree ? "translate-x-6" : "translate-x-1"
+                  className={`absolute left-1 inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                    lessonDraft.isFree ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
@@ -342,7 +320,7 @@ export function CourseDetailsAdminClient({ courseId }: CourseDetailsAdminClientP
 
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setIsLessonModalOpen(false)}>Cancel</Button>
-              <Button onClick={handleSaveLesson}>Save Lesson</Button>
+              <Button onClick={handleSaveLesson} disabled={isSavingLesson}>{isSavingLesson ? "Saving..." : "Save Lesson"}</Button>
             </div>
           </div>
         ) : null}

@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { formatCurrency } from "@/lib/utils";
+import { formatCoursePrice } from "@/lib/utils";
 import { Course } from "@/types/course";
 
 interface CourseCardProps {
   course: Course;
+  actionLabel?: string;
+  actionHref?: string;
+  hidePrice?: boolean;
 }
 
 const levelLabels = {
@@ -14,7 +17,12 @@ const levelLabels = {
   Advanced: "الصف الثالث الثانوي",
 } as const;
 
-export function CourseCard({ course }: CourseCardProps) {
+export function CourseCard({
+  course,
+  actionLabel = "عرض التفاصيل",
+  actionHref,
+  hidePrice = false,
+}: CourseCardProps) {
   return (
     <article className="surface-card surface-card-hover section-reveal group rounded-[30px]">
       <div className="relative aspect-[1.12/0.62] overflow-hidden rounded-[26px]">
@@ -55,14 +63,20 @@ export function CourseCard({ course }: CourseCardProps) {
 
         <div className="mt-5 flex items-center justify-between gap-4">
           <Link
-            href={`/courses/${course.id}`}
+            href={actionHref ?? `/courses/${course.id}`}
             className="interactive-lift inline-flex h-11 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary),var(--secondary))] px-6 text-base font-semibold text-white shadow-[0_18px_34px_-18px_rgba(79,70,229,0.42)]"
           >
-            عرض التفاصيل
+            {actionLabel}
           </Link>
-          <p className="text-[1.35rem] font-black text-[var(--text-primary)]">
-            {formatCurrency(course.price)}
-          </p>
+          {!hidePrice ? (
+            <p className="text-[1.35rem] font-black text-[var(--text-primary)]">
+              {formatCoursePrice(course.price)}
+            </p>
+          ) : (
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+              مشترك
+            </span>
+          )}
         </div>
       </div>
     </article>

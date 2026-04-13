@@ -52,7 +52,12 @@ export function MyCoursesClient() {
           ) : null}
           {!loading && !error && courses.length ? (
             <div className="mt-8">
-              <CourseGrid courses={courses} />
+              <CourseGrid
+                courses={courses}
+                actionLabel="شاهد الان"
+                actionHrefBuilder={(course) => `/courses/${course.id}/learn`}
+                hidePrice
+              />
             </div>
           ) : null}
         </div>

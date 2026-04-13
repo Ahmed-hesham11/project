@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { useAuth } from "@/components/auth/AuthProvider";
 import { CourseCard } from "@/components/courses/CourseCard";
+import { getMyEnrollments } from "@/lib/api/enrollments";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Course } from "@/types/course";
 
@@ -20,7 +22,34 @@ interface CurrentCoursesFilterClientProps {
 }
 
 export function CurrentCoursesFilterClient({ courses }: CurrentCoursesFilterClientProps) {
+  const { token } = useAuth();
   const [activeFilter, setActiveFilter] = useState<GradeFilter>("all");
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!token) {
+      setEnrolledCourseIds(new Set());
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const enrollments = await getMyEnrollments(token);
+        if (cancelled) return;
+        setEnrolledCourseIds(new Set(enrollments.map((item) => item.courseId)));
+      } catch {
+        if (!cancelled) {
+          setEnrolledCourseIds(new Set());
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   const filteredCourses = useMemo(() => {
     if (activeFilter === "all") {
@@ -56,7 +85,12 @@ export function CurrentCoursesFilterClient({ courses }: CurrentCoursesFilterClie
               className="section-reveal"
               style={{ animationDelay: `${index * 110}ms` }}
             >
-              <CourseCard course={course} />
+              <CourseCard
+                course={course}
+                actionLabel={enrolledCourseIds.has(course.id) ? "شاهد الآن" : "عرض التفاصيل"}
+                actionHref={enrolledCourseIds.has(course.id) ? `/courses/${course.id}/learn` : undefined}
+                hidePrice={enrolledCourseIds.has(course.id)}
+              />
             </div>
           ))}
         </div>

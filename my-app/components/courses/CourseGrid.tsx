@@ -4,9 +4,21 @@ import { Course } from "@/types/course";
 
 interface CourseGridProps {
   courses: Course[];
+  actionLabel?: string;
+  actionLabelBuilder?: (course: Course) => string;
+  actionHrefBuilder?: (course: Course) => string;
+  hidePrice?: boolean;
+  hidePriceBuilder?: (course: Course) => boolean;
 }
 
-export function CourseGrid({ courses }: CourseGridProps) {
+export function CourseGrid({
+  courses,
+  actionLabel,
+  actionLabelBuilder,
+  actionHrefBuilder,
+  hidePrice = false,
+  hidePriceBuilder,
+}: CourseGridProps) {
   if (!courses.length) {
     return (
       <EmptyState
@@ -26,7 +38,12 @@ export function CourseGrid({ courses }: CourseGridProps) {
           className="section-reveal"
           style={{ animationDelay: `${index * 90}ms` }}
         >
-          <CourseCard course={course} />
+          <CourseCard
+            course={course}
+            actionLabel={actionLabelBuilder ? actionLabelBuilder(course) : actionLabel}
+            actionHref={actionHrefBuilder?.(course)}
+            hidePrice={hidePriceBuilder ? hidePriceBuilder(course) : hidePrice}
+          />
         </div>
       ))}
     </div>

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const updateCourseSchema = z.object({
   title: z.string().min(1).optional(),
   tagline: z.string().min(1).optional(),
-  price: z.coerce.number().positive().optional(),
+  price: z.coerce.number().min(0).optional(),
   level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]).optional(),
 });
 
@@ -18,7 +18,7 @@ export const createCourseSchema = z.object({
   lessonsCount: z.coerce.number().int().min(0).default(0),
   students: z.coerce.number().int().min(0).default(0),
   rating: z.coerce.number().min(0).max(5).default(0),
-  price: z.coerce.number().positive(),
+  price: z.coerce.number().min(0),
   image: z.string().min(1),
   featured: z.boolean().default(false),
   mentorId: z.string().min(1),

@@ -81,14 +81,14 @@ export function CourseTable({
                     <button
                       type="button"
                       onClick={() => onToggleStatus(course.id)}
-                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition ${
+                      className={`relative inline-flex h-7 w-12 items-center overflow-hidden rounded-full transition ${
                         active ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
                       }`}
                       aria-label={`Toggle status for ${course.title}`}
                     >
                       <span
-                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
-                          active ? "translate-x-6" : "translate-x-1"
+                        className={`absolute left-1 inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                          active ? "translate-x-5" : "translate-x-0"
                         }`}
                       />
                     </button>
