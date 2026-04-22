@@ -8,7 +8,6 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { enrollInCourse } from "@/lib/api/enrollments";
-import { createPaymentRequest } from "@/lib/api/lms";
 import { formatCoursePrice } from "@/lib/utils";
 import { Course } from "@/types/course";
 
@@ -21,7 +20,6 @@ export function CourseDetails({ course }: CourseDetailsProps) {
   const { isAuthenticated, token } = useAuth();
   const [enrolling, setEnrolling] = useState(false);
   const [enrollError, setEnrollError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"PAYMOB" | "FAWRY" | "INSTAPAY" | "VODAFONE_CASH">("PAYMOB");
   const mentor = course.mentor;
   const levelLabels = {
     Beginner: "الصف الأول الثانوي",
@@ -47,27 +45,10 @@ export function CourseDetails({ course }: CourseDetailsProps) {
     }
   }
 
-  async function handlePaymentRequest() {
-    if (!isAuthenticated || !token) {
-      router.push("/login");
-      return;
-    }
-    setEnrolling(true);
-    setEnrollError(null);
-    try {
-      await createPaymentRequest(course.id, paymentMethod, token);
-      setEnrollError("تم إنشاء طلب دفع، وسيتم تفعيل الاشتراك بعد المراجعة.");
-    } catch (error) {
-      setEnrollError(error instanceof Error ? error.message : "Payment request failed");
-    } finally {
-      setEnrolling(false);
-    }
-  }
-
   return (
     <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
       <div className="space-y-8">
-        <div className="section-reveal relative aspect-[16/9] overflow-hidden rounded-[34px] border border-white/10 bg-slate-950 shadow-[0_26px_54px_-34px_rgba(2,8,23,0.8)]">
+        <div className="section-reveal relative aspect-[16/9] overflow-hidden rounded-[34px] border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
           <Image
             src={course.image}
             alt={course.title}
@@ -76,13 +57,13 @@ export function CourseDetails({ course }: CourseDetailsProps) {
             sizes="(max-width: 1024px) 100vw, 70vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.1),transparent_40%,rgba(15,23,42,0.7)_100%)]" />
-          <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-4 p-6 text-white">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),transparent_40%,rgba(15,23,42,0.28)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-4 p-6 text-[var(--text-main)]">
             <div>
-              <p className="text-sm text-white/80">{course.category}</p>
+              <p className="text-sm text-[var(--text-main)]">{course.category}</p>
               <h1 className="mt-2 text-3xl font-black md:text-4xl">{course.title}</h1>
             </div>
-            <div className="rounded-full border border-white/20 bg-black/20 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
+            <div className="rounded-full border border-[var(--border)] bg-[var(--bg-main)] px-4 py-2 text-sm font-semibold backdrop-blur-sm">
               {levelLabels[course.level]}
             </div>
           </div>
@@ -95,33 +76,33 @@ export function CourseDetails({ course }: CourseDetailsProps) {
               <Badge key={tag}>{tag}</Badge>
             ))}
           </div>
-          <p className="mt-5 text-base leading-8 text-slate-300">
+          <p className="mt-5 text-base leading-8 text-[var(--text-secondary)]">
             {course.description}
           </p>
         </Card>
 
         <Card className="section-reveal">
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-[var(--text-main)]">
             محتوى الكورس
           </h2>
           <div className="mt-6 space-y-4">
             {course.modules.map((module, moduleIndex) => (
               <div
                 key={module.id}
-                className="rounded-[28px] border border-white/10 bg-white/6 p-5 shadow-[0_18px_34px_-26px_rgba(2,8,23,0.55)]"
+                className="rounded-[28px] border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
                 style={{ animationDelay: `${moduleIndex * 90}ms` }}
               >
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-lg font-bold text-[var(--text-main)]">
                   {module.title}
                 </h3>
                 <ul className="mt-4 space-y-3">
                   {module.lessons.map((lesson) => (
                     <li
                       key={lesson.id}
-                      className="interactive-lift flex items-center justify-between rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.92),rgba(30,41,59,0.76))] px-4 py-3 text-sm text-slate-300 shadow-[0_12px_26px_-24px_rgba(2,8,23,0.55)]"
+                      className="interactive-lift flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-section)] px-4 py-3 text-sm text-[var(--text-secondary)] shadow-[0_10px_24px_rgba(0,0,0,0.04)]"
                     >
                       <span>{lesson.title}</span>
-                      <span className={lesson.locked ? "text-rose-300" : "text-sky-300"}>
+                      <span className={lesson.locked ? "text-rose-300" : "text-[var(--primary-light)]"}>
                         {lesson.locked ? "مغلق" : lesson.duration}
                       </span>
                     </li>
@@ -136,52 +117,30 @@ export function CourseDetails({ course }: CourseDetailsProps) {
       <div className="space-y-8">
         <div className="section-reveal">
           <Card className="space-y-5">
-            <p className="text-sm font-semibold tracking-[0.24em] text-emerald-300">
+            <p className="text-sm font-semibold tracking-[0.24em] text-[var(--primary)]">
               سجل الآن
             </p>
-            <p className="text-4xl font-black text-white" dir="ltr">
+            <p className="text-4xl font-black text-[var(--text-main)]" dir="ltr">
               {formatCoursePrice(course.price)}
             </p>
-            <p className="text-sm leading-7 text-slate-300">
+            <p className="text-sm leading-7 text-[var(--text-secondary)]">
               اشترك الآن للوصول لكل الدروس والاختبارات والمحتوى الكامل للكورس.
             </p>
             <button
               onClick={handleEnroll}
               disabled={enrolling}
-              className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-[linear-gradient(to_right,_var(--primary),_var(--secondary))] px-8 text-base font-medium text-white"
+              className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--primary),var(--accent))] px-8 text-base font-medium text-white shadow-[0_10px_24px_rgba(0,0,0,0.08)]"
             >
               {enrolling ? "جاري التسجيل..." : "سجل الان"}
             </button>
-            <label className="grid gap-2 text-sm text-slate-300">
-              <span>طريقة الدفع</span>
-              <select
-                value={paymentMethod}
-                onChange={(event) =>
-                  setPaymentMethod(event.target.value as "PAYMOB" | "FAWRY" | "INSTAPAY" | "VODAFONE_CASH")
-                }
-                className="h-11 rounded-xl border border-white/10 bg-white/10 px-3 text-white"
-              >
-                <option value="PAYMOB">Paymob</option>
-                <option value="FAWRY">Fawry</option>
-                <option value="INSTAPAY">Instapay</option>
-                <option value="VODAFONE_CASH">Vodafone Cash</option>
-              </select>
-            </label>
-            <button
-              onClick={handlePaymentRequest}
-              disabled={enrolling}
-              className="mt-2 flex h-11 w-full items-center justify-center rounded-xl border border-white/20 bg-white/10 px-8 text-base font-medium text-white"
-            >
-              {enrolling ? "جاري إنشاء الطلب..." : "طلب دفع يدوي"}
-            </button>
-            {enrollError ? <p className="text-sm text-rose-300">{enrollError}</p> : null}
+            {enrollError ? <p className="text-sm text-rose-600">{enrollError}</p> : null}
           </Card>
         </div>
 
         {mentor ? (
           <Card className="section-reveal">
             <div className="flex items-center gap-4">
-              <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/10 shadow-sm">
+              <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-[var(--border)] shadow-sm">
                 <Image
                   src="/images/logo.jpg"
                   alt={mentor.name}
@@ -191,15 +150,15 @@ export function CourseDetails({ course }: CourseDetailsProps) {
                 />
               </div>
               <div>
-                <p className="font-bold text-white">
+                <p className="font-bold text-[var(--text-main)]">
                   {mentor.name}
                 </p>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-[var(--text-secondary)]">
                   {mentor.role}
                 </p>
               </div>
             </div>
-            <p className="mt-4 text-sm leading-7 text-slate-300">
+            <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
               خبرة أكثر من 20 سنة في تدريس مادة الرياضيات
               (عام - أزهري - أدبي) مع أسلوب مبسط يركز على
               الفهم العميق والتدرج في حل الأسئلة.

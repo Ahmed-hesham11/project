@@ -36,14 +36,14 @@ export function Sidebar({
 
   return (
     <aside className="w-full lg:w-72">
-      <Card className="dashboard-card relative sticky top-24 overflow-hidden border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(30,41,59,0.94))] p-5 text-white shadow-[0_24px_46px_-28px_rgba(15,23,42,0.7)] hover:border-sky-300/25 hover:shadow-[0_28px_54px_-28px_rgba(14,165,233,0.28)]">
-        <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_right,rgba(6,182,212,0.3),transparent_55%),radial-gradient(circle_at_top_left,rgba(79,70,229,0.26),transparent_48%)]" />
+      <Card className="dashboard-card relative sticky top-24 overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] p-5 text-[var(--text-main)] shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:border-[var(--primary)]/35 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+        <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.16),transparent_55%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_48%)]" />
         <div className="flex items-center">
           <div className="relative z-10">
-            <p className="font-semibold text-white">
+            <p className="font-semibold text-[var(--text-main)]">
               {displayUser.name}
             </p>
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-[var(--text-muted)]">
               {displayUser.role}
             </p>
           </div>
@@ -53,7 +53,7 @@ export function Sidebar({
             <Link
               key={link.href}
               href={link.href}
-              className="flex rounded-2xl border border-transparent px-4 py-3 text-sm font-medium text-slate-200 transition hover:border-sky-300/20 hover:bg-white/8 hover:text-white"
+              className="flex rounded-2xl border border-transparent px-4 py-3 text-sm font-medium text-[var(--text-muted)] transition hover:border-[var(--primary)]/25 hover:bg-[var(--hover-soft)] hover:text-[var(--text-main)]"
             >
               {link.label}
             </Link>

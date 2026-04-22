@@ -13,7 +13,7 @@ export default function AdminPage() {
 
   return (
     <ProtectedRoute requiredRoles={["ADMIN", "SUPER_ADMIN"]}>
-      <div className="p-8 text-center text-slate-300">Redirecting to dashboard...</div>
+      <div className="p-8 text-center text-[var(--text-secondary)]">Redirecting to dashboard...</div>
     </ProtectedRoute>
   );
 }

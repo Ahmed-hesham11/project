@@ -12,14 +12,13 @@ interface FormData {
   firstName: string;
   secondName: string;
   thirdName: string;
-  lastName: string;
+  fourthName: string;
   studentPhone: string;
-  fatherPhone: string;
-  motherPhone: string;
+  parentPhone: string;
   governorate: string;
   educationType: string;
   grade: string;
-  department: string;
+  specialization: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -31,30 +30,40 @@ interface FormErrors {
 
 const GOVERNORATES = [
   "القاهرة",
-  "الإسكندرية",
   "الجيزة",
+  "الإسكندرية",
   "الدقهلية",
+  "البحر الأحمر",
   "البحيرة",
-  "السويس",
-  "المنوفية",
-  "القليوبية",
-  "الشرقية",
-  "قنا",
   "الفيوم",
+  "الغربية",
+  "الإسماعيلية",
+  "المنوفية",
+  "المنيا",
+  "القليوبية",
   "الوادي الجديد",
-  "مطروح",
+  "السويس",
   "أسوان",
+  "أسيوط",
+  "بني سويف",
+  "بورسعيد",
+  "دمياط",
+  "الشرقية",
+  "جنوب سيناء",
+  "كفر الشيخ",
+  "مطروح",
   "الأقصر",
-  "سيناء",
+  "قنا",
+  "شمال سيناء",
+  "سوهاج",
 ];
 
-const EDUCATION_TYPES = ["حكومي", "خاص", "أزهري"];
+const EDUCATION_TYPES = ["عام", "أزهري"];
 
 const GRADES = ["الصف الأول الثانوي", "الصف الثاني الثانوي", "الصف الثالث الثانوي"];
 
-const DEPARTMENTS = ["علمي علوم", "علمي رياضة", "أدبي"];
+const SPECIALIZATIONS = ["علمي علوم", "علمي رياضة", "أدبي"];
 
-// Move component definitions outside to prevent re-creation on every render
 interface FormFieldProps {
   label: string;
   name: string;
@@ -80,10 +89,10 @@ const FormField = ({
   onChange,
   error,
 }: FormFieldProps) => (
-  <div className="flex flex-col">
-    <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">
+  <div className="flex min-h-[88px] flex-col gap-2">
+    <label className="block text-sm font-semibold text-gray-700">
       {label}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && <span className="ml-1 text-red-500">*</span>}
     </label>
     <div className="relative">
       <input
@@ -93,13 +102,17 @@ const FormField = ({
         onChange={onChange}
         placeholder={placeholder}
         maxLength={maxLength}
-        className={`w-full h-[52px] px-4 py-[14px] pr-12 rounded-[8px] border transition-all duration-200 outline-none ${
-          error ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-30" : "border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:ring-opacity-20"
-        } bg-[var(--surface)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]`}
+        className={`w-full h-14 rounded-xl border bg-white px-4 py-3 pr-12 text-gray-900 shadow-sm transition-all duration-200 outline-none ${
+          error
+            ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-30"
+            : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        } placeholder:text-gray-400`}
       />
-      {Icon && <Icon className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] pointer-events-none" />}
+      {Icon ? (
+        <Icon className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+      ) : null}
     </div>
-    {error && <p className="text-xs text-red-500 mt-1.5">{error}</p>}
+    <p className={`text-xs ${error ? "text-red-500" : "invisible"}`}>{error || "."}</p>
   </div>
 );
 
@@ -122,18 +135,20 @@ const SelectField = ({
   onChange,
   error,
 }: SelectFieldProps) => (
-  <div className="flex flex-col">
-    <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">
+  <div className="flex min-h-[88px] flex-col gap-2">
+    <label className="block text-sm font-semibold text-gray-700">
       {label}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && <span className="ml-1 text-red-500">*</span>}
     </label>
     <select
       name={name}
       value={value}
       onChange={onChange}
-      className={`w-full h-[52px] px-4 py-[14px] rounded-[8px] border transition-all duration-200 outline-none ${
-        error ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-30" : "border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:ring-opacity-20"
-      } bg-[var(--surface)] text-[var(--text-primary)]`}
+      className={`w-full h-14 rounded-xl border bg-white px-4 py-3 text-gray-900 shadow-sm transition-all duration-200 outline-none ${
+        error
+          ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-30"
+          : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+      }`}
     >
       <option value="">اختر {label}</option>
       {options.map((option) => (
@@ -142,7 +157,7 @@ const SelectField = ({
         </option>
       ))}
     </select>
-    {error && <p className="text-xs text-red-500 mt-1.5">{error}</p>}
+    <p className={`text-xs ${error ? "text-red-500" : "invisible"}`}>{error || "."}</p>
   </div>
 );
 
@@ -165,10 +180,10 @@ const PasswordField = ({
   onChange,
   error,
 }: PasswordFieldProps) => (
-  <div className="flex flex-col">
-    <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">
+  <div className="flex min-h-[88px] flex-col gap-2">
+    <label className="block text-sm font-semibold text-gray-700">
       {label}
-      <span className="text-red-500 ml-1">*</span>
+      <span className="ml-1 text-red-500">*</span>
     </label>
     <div className="relative">
       <input
@@ -176,21 +191,23 @@ const PasswordField = ({
         name={name}
         value={value}
         onChange={onChange}
-        placeholder="••••••••"
-        className={`w-full h-[52px] px-4 py-[14px] pr-12 pl-12 rounded-[8px] border transition-all duration-200 outline-none ${
-          error ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-30" : "border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)] focus:ring-opacity-20"
-        } bg-[var(--surface)] text-[var(--text-primary)]`}
+        placeholder="........"
+        className={`w-full h-14 rounded-xl border bg-white px-4 py-3 pl-12 pr-12 text-gray-900 shadow-sm transition-all duration-200 outline-none ${
+          error
+            ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-30"
+            : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        }`}
       />
-      <Lock className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] pointer-events-none" />
+      <Lock className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
       <button
         type="button"
         onClick={() => setShow(!show)}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+        className="absolute left-4 top-1/2 -translate-y-1/2 transform text-gray-400 transition-colors duration-200 hover:text-gray-600"
       >
-        {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+        {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
       </button>
     </div>
-    {error && <p className="text-xs text-red-500 mt-1.5">{error}</p>}
+    <p className={`text-xs ${error ? "text-red-500" : "invisible"}`}>{error || "."}</p>
   </div>
 );
 
@@ -201,14 +218,13 @@ export default function RegisterPage() {
     firstName: "",
     secondName: "",
     thirdName: "",
-    lastName: "",
+    fourthName: "",
     studentPhone: "",
-    fatherPhone: "",
-    motherPhone: "",
+    parentPhone: "",
     governorate: "",
     educationType: "",
     grade: "الصف الثالث الثانوي",
-    department: "",
+    specialization: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -233,66 +249,42 @@ export default function RegisterPage() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // Required fields validation
     if (!formData.firstName.trim()) newErrors.firstName = "الاسم الأول مطلوب";
     if (!formData.secondName.trim()) newErrors.secondName = "الاسم الثاني مطلوب";
     if (!formData.thirdName.trim()) newErrors.thirdName = "الاسم الثالث مطلوب";
-    if (!formData.lastName.trim()) newErrors.lastName = "الاسم الأخير مطلوب";
+    if (!formData.fourthName.trim()) newErrors.fourthName = "الاسم الرابع مطلوب";
 
-    // Phone validation
     if (!formData.studentPhone.trim()) {
       newErrors.studentPhone = "رقم الطالب مطلوب";
     } else if (!validateEgyptianPhone(formData.studentPhone)) {
       newErrors.studentPhone = "رقم الهاتف غير صحيح";
     }
 
-    if (!formData.fatherPhone.trim()) {
-      newErrors.fatherPhone = "رقم الأب مطلوب";
-    } else if (!validateEgyptianPhone(formData.fatherPhone)) {
-      newErrors.fatherPhone = "رقم الهاتف غير صحيح";
+    if (!formData.parentPhone.trim()) {
+      newErrors.parentPhone = "رقم ولي الأمر مطلوب";
+    } else if (!validateEgyptianPhone(formData.parentPhone)) {
+      newErrors.parentPhone = "رقم الهاتف غير صحيح";
     }
 
-    if (formData.motherPhone && !validateEgyptianPhone(formData.motherPhone)) {
-      newErrors.motherPhone = "رقم الهاتف غير صحيح";
+    if (formData.studentPhone === formData.parentPhone) {
+      newErrors.studentPhone = "رقم الطالب يجب أن يكون مختلف عن رقم ولي الأمر";
+      newErrors.parentPhone = "رقم ولي الأمر يجب أن يكون مختلف عن رقم الطالب";
     }
 
-    // Check for unique phone numbers
-    const phones = [formData.studentPhone, formData.fatherPhone, formData.motherPhone].filter(Boolean);
-    const uniquePhones = new Set(phones);
-    
-    if (phones.length !== uniquePhones.size) {
-      // Check which ones are duplicates
-      if (formData.studentPhone === formData.fatherPhone) {
-        newErrors.studentPhone = "رقم الطالب يجب أن يكون مختلف عن رقم الأب";
-        newErrors.fatherPhone = "رقم الأب يجب أن يكون مختلف عن رقم الطالب";
-      }
-      if (formData.studentPhone === formData.motherPhone && formData.motherPhone) {
-        newErrors.studentPhone = "رقم الطالب يجب أن يكون مختلف عن رقم الأم";
-        newErrors.motherPhone = "رقم الأم يجب أن يكون مختلف عن رقم الطالب";
-      }
-      if (formData.fatherPhone === formData.motherPhone && formData.motherPhone) {
-        newErrors.fatherPhone = "رقم الأب يجب أن يكون مختلف عن رقم الأم";
-        newErrors.motherPhone = "رقم الأم يجب أن يكون مختلف عن رقم الأب";
-      }
-    }
-
-    // Dropdowns validation
     if (!formData.governorate) newErrors.governorate = "اختر المحافظة";
     if (!formData.educationType) newErrors.educationType = "اختر نوع التعليم";
-    if (!formData.department) newErrors.department = "اختر التخصص";
+    if (!formData.specialization) newErrors.specialization = "اختر التخصص";
 
-    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "البريد الإلكتروني مطلوب";
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "البريد الإلكتروني غير صحيح";
     }
 
-    // Password validation
     if (!formData.password) {
       newErrors.password = "كلمة المرور مطلوبة";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
     }
 
     if (!formData.confirmPassword) {
@@ -309,11 +301,9 @@ export default function RegisterPage() {
     const { name } = e.target;
     let { value } = e.target;
 
-    // Apply maxLength restrictions (only for phone numbers)
     const maxLengths: { [key: string]: number } = {
       studentPhone: 11,
-      fatherPhone: 11,
-      motherPhone: 11,
+      parentPhone: 11,
     };
 
     if (maxLengths[name] && value.length > maxLengths[name]) {
@@ -324,7 +314,7 @@ export default function RegisterPage() {
       ...prev,
       [name]: value,
     }));
-    // Clear error for this field when user starts typing
+
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -343,7 +333,20 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      await register(formData);
+      await register({
+        firstName: formData.firstName,
+        secondName: formData.secondName,
+        thirdName: formData.thirdName,
+        fourthName: formData.fourthName,
+        studentPhone: formData.studentPhone,
+        parentPhone: formData.parentPhone,
+        email: formData.email,
+        governorate: formData.governorate,
+        educationType: formData.educationType,
+        grade: formData.grade,
+        specialization: formData.specialization,
+        password: formData.password,
+      });
       router.push("/dashboard");
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "حدث خطأ أثناء إنشاء الحساب");
@@ -353,24 +356,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8 md:py-12">
-      <Card className="section-reveal w-full max-w-[650px] rounded-2xl p-8 md:p-10 shadow-lg">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--primary)]">
+    <div className="flex min-h-screen items-center justify-center bg-[#f4f8ff] px-4 py-6 sm:px-6 md:py-10">
+      <Card className="section-reveal w-full max-w-[720px] rounded-2xl border border-gray-200 bg-white p-5 shadow-xl sm:p-7 md:p-10">
+        <div className="mb-8 text-center md:mb-10">
+          <p className="text-xs font-bold uppercase tracking-widest text-blue-600">
             تسجيل جديد
           </p>
-          <h1 className="mt-4 text-3xl md:text-4xl font-bold text-[var(--text-primary)]">
-            إنشئ حسابك الآن
+          <h1 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl">
+            أنشئ حسابك الآن
           </h1>
-          <p className="mt-3 text-sm md:text-base text-[var(--text-secondary)]">
-            انضم إلى منصة وليد زيادي لتعلم الرياضيات بطريقة أفضل
-          </p>
         </div>
 
-        {/* Form - 2 Column Grid Layout */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-y-[28px] gap-x-[24px] max-w-[600px] mx-auto">
-          {/* Row 1: First Name & Second Name */}
+        <form onSubmit={handleSubmit} className="mx-auto grid max-w-[640px] grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2 md:gap-x-6 md:gap-y-5">
           <FormField
             label="الاسم الأول"
             name="firstName"
@@ -390,7 +387,6 @@ export default function RegisterPage() {
             error={errors.secondName}
           />
 
-          {/* Row 2: Third Name & Last Name */}
           <FormField
             label="الاسم الثالث"
             name="thirdName"
@@ -401,16 +397,15 @@ export default function RegisterPage() {
             error={errors.thirdName}
           />
           <FormField
-            label="الاسم الأخير"
-            name="lastName"
+            label="الاسم الرابع"
+            name="fourthName"
             placeholder="محمود"
             icon={User}
-            value={formData.lastName}
+            value={formData.fourthName}
             onChange={handleChange}
-            error={errors.lastName}
+            error={errors.fourthName}
           />
 
-          {/* Row 3: Student Phone & Father Phone */}
           <FormField
             label="رقم الطالب"
             name="studentPhone"
@@ -422,32 +417,16 @@ export default function RegisterPage() {
             error={errors.studentPhone}
           />
           <FormField
-            label="رقم الأب"
-            name="fatherPhone"
+            label="رقم ولي الأمر"
+            name="parentPhone"
             type="tel"
             placeholder="01098765432"
             icon={Phone}
-            value={formData.fatherPhone}
+            value={formData.parentPhone}
             onChange={handleChange}
-            error={errors.fatherPhone}
+            error={errors.parentPhone}
           />
 
-          {/* Row 4: Mother Phone - Full Width */}
-          <div className="md:col-span-2">
-            <FormField
-              label="رقم الأم"
-              name="motherPhone"
-              type="tel"
-              placeholder="01155667788"
-              icon={Phone}
-              required={false}
-              value={formData.motherPhone}
-              onChange={handleChange}
-              error={errors.motherPhone}
-            />
-          </div>
-
-          {/* Row 5: Governorate - Full Width */}
           <div className="md:col-span-2">
             <SelectField
               label="المحافظة"
@@ -459,7 +438,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Row 6: Education Type - Full Width */}
           <div className="md:col-span-2">
             <SelectField
               label="نوع التعليم"
@@ -471,7 +449,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Row 7: Grade - Full Width */}
           <div className="md:col-span-2">
             <SelectField
               label="الصف الدراسي"
@@ -483,19 +460,17 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Row 8: Department - Full Width */}
           <div className="md:col-span-2">
             <SelectField
               label="التخصص"
-              name="department"
-              options={DEPARTMENTS}
-              value={formData.department}
+              name="specialization"
+              options={SPECIALIZATIONS}
+              value={formData.specialization}
               onChange={handleChange}
-              error={errors.department}
+              error={errors.specialization}
             />
           </div>
 
-          {/* Row 9: Email - Full Width */}
           <div className="md:col-span-2">
             <FormField
               label="البريد الإلكتروني"
@@ -509,7 +484,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Row 10: Password & Confirm Password */}
           <PasswordField
             label="كلمة المرور"
             name="password"
@@ -529,21 +503,19 @@ export default function RegisterPage() {
             error={errors.confirmPassword}
           />
 
-          {/* Submit Button - Full Width */}
           <button
             type="submit"
             disabled={isLoading}
-            className="md:col-span-2 h-[52px] w-full mt-[32px] rounded-[10px] bg-[linear-gradient(135deg,var(--primary),var(--secondary))] text-white font-semibold hover:shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-3 h-14 w-full rounded-xl bg-blue-600 text-white font-semibold transition-all duration-300 hover:bg-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70 md:col-span-2"
           >
             {isLoading ? "جاري إنشاء الحساب..." : "انشئ الحساب"}
           </button>
-          {submitError ? <p className="md:col-span-2 text-sm text-rose-500">{submitError}</p> : null}
+          {submitError ? <p className="text-sm text-rose-500 md:col-span-2">{submitError}</p> : null}
         </form>
 
-        {/* Sign In Link */}
-        <p className="mt-[32px] text-center text-sm text-[var(--text-secondary)]">
+        <p className="mt-6 text-center text-sm text-gray-600 md:mt-8">
           يوجد لديك حساب بالفعل؟{" "}
-          <Link href="/login" className="font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors">
+          <Link href="/login" className="font-semibold text-blue-600 transition-colors hover:text-blue-700">
             تسجيل الدخول
           </Link>
         </p>

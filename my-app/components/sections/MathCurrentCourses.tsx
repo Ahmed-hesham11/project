@@ -15,10 +15,10 @@ export async function MathCurrentCourses() {
   }
 
   return (
-    <section className="page-shell py-18">
-      <div className="mx-auto w-full max-w-[1400px] px-5 lg:px-8 xl:px-10">
+    <section className="relative overflow-hidden bg-white py-16 lg:py-20">
+      <div className="ds-container">
         <div className="section-reveal text-right">
-          <span className="inline-flex rounded-full border border-indigo-300/20 bg-indigo-400/10 px-6 py-3 text-lg font-bold text-indigo-200 shadow-sm">
+          <span className="inline-flex rounded-full border border-[var(--primary-light)] bg-[var(--primary-soft)] px-6 py-3 text-lg font-bold text-[var(--primary)] shadow-sm">
             الكورسات الحالية
           </span>
           <h2 className="mt-5 font-display text-4xl font-bold leading-normal text-[var(--text-primary)]">

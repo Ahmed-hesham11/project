@@ -23,12 +23,12 @@ export default function StudentDashboardPage() {
     <ProtectedRoute requiredRoles={["USER"]}>
       <section className="page-shell py-12">
         <div className="mx-auto w-full max-w-6xl px-5">
-          <h1 className="text-3xl font-bold text-white">Student Dashboard</h1>
-          {error ? <p className="mt-4 text-rose-300">{error}</p> : null}
+          <h1 className="text-3xl font-bold text-[var(--text-main)]">Student Dashboard</h1>
+          {error ? <p className="mt-4 text-rose-600">{error}</p> : null}
           {!data ? (
-            <p className="mt-4 text-slate-300">Loading...</p>
+            <p className="mt-4 text-[var(--text-secondary)]">Loading...</p>
           ) : (
-            <div className="mt-6 space-y-4 text-slate-200">
+            <div className="mt-6 space-y-4 text-[var(--text-secondary)]">
               <p>Enrolled courses: {data.enrolledCourses.length}</p>
               <p>Submissions: {data.submissionsCount}</p>
               <p>Upcoming assignments: {data.upcomingAssignments.length}</p>

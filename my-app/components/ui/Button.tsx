@@ -24,15 +24,15 @@ interface ButtonLinkProps extends SharedButtonProps {
 }
 
 const baseClassName =
-  "inline-flex items-center justify-center rounded-xl font-medium transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2";
+  "inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "bg-[linear-gradient(to_right,_var(--primary),_var(--secondary))] text-white shadow-[var(--shadow-lg)] hover:-translate-y-0.5 hover:bg-[linear-gradient(to_right,_var(--primary-hover),_var(--secondary-hover))] hover:shadow-[var(--shadow-xl)]",
+    "bg-[var(--primary)] text-white shadow-[0_10px_22px_rgba(79,142,247,0.24)] hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]",
   secondary:
-    "border border-[var(--border)] bg-transparent text-[var(--primary)] hover:-translate-y-0.5 hover:border-[var(--primary)] hover:bg-[var(--surface-hover)]",
+    "border border-[var(--primary-light)] bg-white text-[var(--primary)] hover:-translate-y-0.5 hover:bg-[var(--primary-soft)]",
   ghost:
-    "text-[var(--text-secondary)] hover:bg-[var(--primary-light)] hover:text-[var(--primary)]",
+    "text-[var(--text-secondary)] hover:bg-[var(--primary-soft)] hover:text-[var(--primary)]",
 };
 
 const sizes: Record<ButtonSize, string> = {

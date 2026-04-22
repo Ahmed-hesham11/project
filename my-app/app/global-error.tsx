@@ -10,13 +10,13 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en" dir="ltr">
-      <body className="flex min-h-screen items-center justify-center bg-slate-50 p-4 text-slate-950 dark:bg-slate-950 dark:text-white">
-        <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xl dark:border-slate-800 dark:bg-slate-900">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-rose-500">
+      <body className="flex min-h-screen items-center justify-center bg-[var(--bg-main)] p-4 text-[var(--text-main)]">
+        <div className="ds-card w-full max-w-lg rounded-3xl p-8 text-center shadow-[var(--shadow-2xl)]">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-rose-600">
             Global error
           </p>
           <h1 className="mt-4 text-3xl font-semibold">Something unexpected happened</h1>
-          <p className="mt-4 text-sm leading-7 text-slate-500 dark:text-slate-400">
+          <p className="mt-4 text-sm leading-8 text-[var(--text-secondary)]">
             The app-level error boundary is active. Retry to recover from the failure.
           </p>
           <Button onClick={unstable_retry} className="mt-6">

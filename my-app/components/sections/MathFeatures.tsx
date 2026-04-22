@@ -1,9 +1,6 @@
 interface FeatureItem {
   title: string;
   description: string;
-  accent: string;
-  glow: string;
-  iconBg: string;
   icon: "layers" | "path" | "quiz" | "bank" | "analytics" | "video";
 }
 
@@ -11,49 +8,31 @@ const featureItems: FeatureItem[] = [
   {
     title: "محتوى منظم",
     description: "جبر وتفاضل وهندسة وحساب مثلثات داخل مسار واضح وسهل المتابعة.",
-    accent: "text-emerald-300",
-    glow: "from-emerald-500/18 via-emerald-300/10 to-transparent",
-    iconBg: "border-emerald-400/20 bg-emerald-400/10",
     icon: "layers",
   },
   {
     title: "حل خطوة بخطوة",
     description: "شرح الفكرة قبل الحل حتى يفهم الطالب طريقة التفكير بنفسه.",
-    accent: "text-sky-300",
-    glow: "from-sky-500/18 via-cyan-300/10 to-transparent",
-    iconBg: "border-sky-400/20 bg-sky-400/10",
     icon: "path",
   },
   {
     title: "اختبارات تفاعلية",
     description: "تدريبات وأسئلة بعد كل جزء مع تغذية راجعة سريعة وواضحة.",
-    accent: "text-indigo-300",
-    glow: "from-indigo-500/18 via-violet-300/10 to-transparent",
-    iconBg: "border-indigo-400/20 bg-indigo-400/10",
     icon: "quiz",
   },
   {
     title: "بنك أسئلة كبير",
     description: "مجموعة واسعة من المسائل المتدرجة لتثبيت الفهم والاستعداد للامتحان.",
-    accent: "text-rose-300",
-    glow: "from-rose-500/18 via-orange-300/10 to-transparent",
-    iconBg: "border-rose-400/20 bg-rose-400/10",
     icon: "bank",
   },
   {
     title: "متابعة مستوى الطالب",
     description: "قراءة سريعة للأداء ونقاط الضعف والتحسن أولًا بأول.",
-    accent: "text-amber-300",
-    glow: "from-amber-500/18 via-yellow-300/10 to-transparent",
-    iconBg: "border-amber-400/20 bg-amber-400/10",
     icon: "analytics",
   },
   {
     title: "فيديوهات احترافية",
     description: "شرح هادئ وواضح بجودة بصرية أفضل وتجربة تعلم أكثر احترافية.",
-    accent: "text-violet-300",
-    glow: "from-violet-500/18 via-indigo-300/10 to-transparent",
-    iconBg: "border-violet-400/20 bg-violet-400/10",
     icon: "video",
   },
 ];
@@ -126,40 +105,54 @@ function FeatureIcon({ type }: { type: FeatureItem["icon"] }) {
   );
 }
 
+function FeatureCard({ item, index }: { item: FeatureItem; index: number }) {
+  return (
+    <article
+      className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/80 p-7 shadow-md backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+      style={{ animationDelay: `${index * 90}ms` }}
+    >
+      <div className="pointer-events-none absolute inset-0 rounded-2xl border border-transparent opacity-0 transition-opacity duration-300 group-hover:border-blue-200/70 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-200/30 blur-2xl transition-all duration-300 group-hover:bg-blue-300/40" />
+
+      <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white">
+        <FeatureIcon type={item.icon} />
+      </div>
+
+      <h3 className="relative mt-6 text-right text-xl font-bold text-gray-900">
+        {item.title}
+      </h3>
+      <p className="relative mt-3 text-right text-base leading-7 text-gray-600">
+        {item.description}
+      </p>
+    </article>
+  );
+}
+
 export function MathFeatures() {
   return (
-    <section className="relative overflow-hidden border-t border-white/8 bg-[linear-gradient(180deg,rgba(8,17,31,0.98),rgba(15,23,42,1),rgba(17,28,49,1))] py-18">
-      <div className="absolute inset-x-0 top-0 h-52 bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.2),transparent_34%),radial-gradient(circle_at_top_right,rgba(6,182,212,0.16),transparent_28%)]" />
-      <div className="mx-auto w-full max-w-[1400px] px-5 lg:px-8 xl:px-10">
-        <div className="section-reveal relative text-center">
-          <span className="inline-flex rounded-full border border-sky-300/20 bg-sky-400/10 px-6 py-3 text-lg font-bold text-sky-200 shadow-sm">
+    <section className="relative overflow-hidden border-t border-gray-100 bg-white py-16 lg:py-20">
+
+      <div className="ds-container relative">
+        <div className="section-reveal text-center max-w-3xl mx-auto">
+          {/* badge */}
+          <span className="inline-block bg-blue-100 text-blue-600 px-8 py-1.5 rounded-full text-base font-semibold shadow-sm">
             مزايا المنصة
           </span>
-          <h2 className="mt-5 font-display text-4xl font-bold leading-normal text-white">
+
+          {/* title */}
+          <h2 className="mt-4 text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
             تجربة تعلم أكثر وضوحًا واحترافية
           </h2>
+
+          {/* description */}
+          <p className="mt-6 text-lg text-gray-600 leading-relaxed">
+            كل أداة في المنصة مصممة لتقليل التشتت، تسريع الفهم، وتحويل المذاكرة إلى تجربة منظمة وفعالة بنتائج واضحة.
+          </p>
         </div>
 
-        <div className="relative mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="relative mx-auto mt-12 grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {featureItems.map((item, index) => (
-            <article
-              key={item.title}
-              className="dashboard-card section-reveal relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.92),rgba(30,41,59,0.84))] px-8 py-8 shadow-[0_24px_50px_-32px_rgba(2,8,23,0.8)]"
-              style={{ animationDelay: `${index * 90}ms` }}
-            >
-              <div className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-br ${item.glow}`} />
-              <div
-                className={`relative flex h-14 w-14 items-center justify-center rounded-[18px] border ${item.iconBg} ${item.accent} shadow-sm`}
-              >
-                <FeatureIcon type={item.icon} />
-              </div>
-              <h3 className="relative mt-10 text-right text-xl font-semibold leading-normal text-white">
-                {item.title}
-              </h3>
-              <p className="relative mt-4 text-right text-base leading-8 text-slate-300">
-                {item.description}
-              </p>
-            </article>
+            <FeatureCard key={item.title} item={item} index={index} />
           ))}
         </div>
       </div>

@@ -26,19 +26,19 @@ export function CourseFilterBar({
   onSortByChange,
 }: CourseFilterBarProps) {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
       <div className="grid gap-3 lg:grid-cols-[minmax(240px,1fr)_180px_200px_180px]">
         <input
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Search by title, category, grade..."
-          className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-sky-400 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100"
+          className="h-11 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-secondary)] outline-none transition focus:border-[var(--primary-light)]"
         />
 
         <select
           value={priceFilter}
           onChange={(event) => onPriceFilterChange(event.target.value as PriceFilter)}
-          className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-sky-400 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100"
+          className="h-11 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-secondary)] outline-none transition focus:border-[var(--primary-light)]"
         >
           <option value="all">All Pricing</option>
           <option value="free">Free</option>
@@ -48,7 +48,7 @@ export function CourseFilterBar({
         <select
           value={levelFilter}
           onChange={(event) => onLevelFilterChange(event.target.value as "all" | CourseLevel)}
-          className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-sky-400 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100"
+          className="h-11 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-secondary)] outline-none transition focus:border-[var(--primary-light)]"
         >
           <option value="all">All Grades</option>
           <option value="Beginner">1st Secondary</option>
@@ -56,7 +56,7 @@ export function CourseFilterBar({
           <option value="Advanced">3rd Secondary</option>
         </select>
 
-        <label className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-300">
+        <label className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-secondary)]">
           <ArrowDownUp className="h-4 w-4" />
           <select
             value={sortBy}

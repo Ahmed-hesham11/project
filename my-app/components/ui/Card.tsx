@@ -10,7 +10,7 @@ export function Card({ children, className, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        "surface-card surface-card-hover rounded-[28px] p-8",
+        "ds-card ds-card-hover surface-card surface-card-hover rounded-[20px] p-[var(--card-padding)]",
         className,
       )}
       {...props}

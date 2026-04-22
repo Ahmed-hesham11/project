@@ -20,13 +20,13 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <Card className="flex min-h-64 flex-col items-center justify-center text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)]">
         {icon ?? "∅"}
       </div>
-      <h3 className="mt-6 text-2xl font-semibold text-slate-950 dark:text-white">
+      <h3 className="mt-6 text-2xl font-semibold text-[var(--text-main)]">
         {title}
       </h3>
-      <p className="mt-3 max-w-md text-sm leading-7 text-slate-500 dark:text-slate-400">
+      <p className="mt-3 max-w-md text-sm leading-7 text-[var(--text-muted)]">
         {description}
       </p>
       {actionHref && actionLabel ? (

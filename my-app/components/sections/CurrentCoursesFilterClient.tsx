@@ -38,7 +38,13 @@ export function CurrentCoursesFilterClient({ courses }: CurrentCoursesFilterClie
       try {
         const enrollments = await getMyEnrollments(token);
         if (cancelled) return;
-        setEnrolledCourseIds(new Set(enrollments.map((item) => item.courseId)));
+        const courseIds = new Set<string>();
+        enrollments.forEach((item) => {
+          if (item) {
+            courseIds.add(item.courseId);
+          }
+        });
+        setEnrolledCourseIds(courseIds);
       } catch {
         if (!cancelled) {
           setEnrolledCourseIds(new Set());
@@ -59,47 +65,53 @@ export function CurrentCoursesFilterClient({ courses }: CurrentCoursesFilterClie
   }, [activeFilter, courses]);
 
   return (
-    <div className="mt-10">
-      <div className="mb-8 flex flex-wrap justify-center gap-3">
-        {filters.map((filter) => (
-          <button
-            key={filter.key}
-            type="button"
-            onClick={() => setActiveFilter(filter.key)}
-            className={`rounded-2xl border px-6 py-3 text-lg font-bold transition ${
-              activeFilter === filter.key
-                ? "border-transparent bg-[linear-gradient(135deg,var(--primary),var(--secondary))] text-white shadow-[0_18px_30px_-18px_rgba(79,70,229,0.55)]"
-                : "border-white/10 bg-white/8 text-slate-200 hover:-translate-y-0.5 hover:border-sky-300/35 hover:bg-sky-400/10 hover:text-white"
-            }`}
-          >
-            {filter.label}
-          </button>
-        ))}
-      </div>
-
-      {filteredCourses.length ? (
-        <div className="grid gap-6 xl:grid-cols-3">
-          {filteredCourses.map((course, index) => (
-            <div
-              key={course.id}
-              className="section-reveal"
-              style={{ animationDelay: `${index * 110}ms` }}
+    <section className="relative overflow-hidden bg-white py-16 lg:py-20">
+      <div className="ds-container relative">
+        {/* Filter Chips */}
+        <div className="mb-10 flex flex-wrap justify-center gap-3">
+          {filters.map((filter) => (
+            <button
+              key={filter.key}
+              type="button"
+              onClick={() => setActiveFilter(filter.key)}
+              className={`rounded-full px-7 py-2.5 text-base font-semibold transition-all duration-300 ${
+                activeFilter === filter.key
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "border border-gray-200 bg-white text-gray-600 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50"
+              }`}
             >
-              <CourseCard
-                course={course}
-                actionLabel={enrolledCourseIds.has(course.id) ? "شاهد الآن" : "عرض التفاصيل"}
-                actionHref={enrolledCourseIds.has(course.id) ? `/courses/${course.id}/learn` : undefined}
-                hidePrice={enrolledCourseIds.has(course.id)}
-              />
-            </div>
+              {filter.label}
+            </button>
           ))}
         </div>
-      ) : (
-        <EmptyState
-          title="لا توجد كورسات لهذا الصف"
-          description="اختار صف مختلف أو ارجع لعرض كل الكورسات."
-        />
-      )}
-    </div>
+
+        {/* Courses Grid */}
+        <div className="mt-12">
+          {filteredCourses.length ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredCourses.map((course, index) => (
+                <div
+                  key={course.id}
+                  className="section-reveal"
+                  style={{ animationDelay: `${index * 110}ms` }}
+                >
+                  <CourseCard
+                    course={course}
+                    actionLabel={enrolledCourseIds.has(course.id) ? "شاهد الآن" : "عرض التفاصيل"}
+                    actionHref={enrolledCourseIds.has(course.id) ? `/courses/${course.id}/learn` : undefined}
+                    hidePrice={enrolledCourseIds.has(course.id)}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="لا توجد كورسات لهذا الصف"
+              description="اختار صف مختلف أو ارجع لعرض كل الكورسات."
+            />
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

@@ -2,13 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Modal } from "@/components/ui/Modal";
-import { updateMe } from "@/lib/api/auth";
+import UserMenu from "@/components/layout/UserMenu";
+import { MOCK_USER_PROFILE } from "@/data/userProfile";
 import { CONTAINER_CLASS, NAV_LINKS } from "@/lib/constants";
 
 function BellIcon() {
@@ -27,98 +25,90 @@ function BellIcon() {
   );
 }
 
-function UserIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-5 w-5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <circle cx="12" cy="8" r="3.5" />
-      <path d="M5.5 19a6.5 6.5 0 0 1 13 0" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 export function Navbar() {
-  const { isAuthenticated, logout, token, user, refreshUser } = useAuth();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
-  const [profileForm, setProfileForm] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-  });
-
-  const hasEditableProfile = Boolean(user?.profile);
+  const { isAuthenticated, logout, user } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setProfileForm({
-      email: user?.email ?? "",
-      firstName: user?.profile?.firstName ?? "",
-      lastName: user?.profile?.lastName ?? "",
-    });
-  }, [user]);
-
-  async function handleSaveProfile() {
-    if (!token) {
-      setSaveError("Please login again");
-      return;
+    function handleScroll() {
+      setIsScrolled(window.scrollY > 18);
     }
 
-    setIsSaving(true);
-    setSaveError(null);
-    setSaveSuccess(null);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
-    try {
-      const payload: { email?: string; firstName?: string; lastName?: string } = {};
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-      if (profileForm.email.trim() && profileForm.email.trim() !== (user?.email ?? "")) {
-        payload.email = profileForm.email.trim();
-      }
-
-      if (hasEditableProfile) {
-        const firstName = profileForm.firstName.trim();
-        const lastName = profileForm.lastName.trim();
-        if (firstName && firstName !== (user?.profile?.firstName ?? "")) {
-          payload.firstName = firstName;
-        }
-        if (lastName && lastName !== (user?.profile?.lastName ?? "")) {
-          payload.lastName = lastName;
-        }
-      }
-
-      if (!Object.keys(payload).length) {
-        setSaveSuccess("No changes to save");
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (!userMenuRef.current) {
         return;
       }
 
-      await updateMe(payload, token);
-      await refreshUser();
-      setSaveSuccess("Profile updated");
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Failed to update profile");
-    } finally {
-      setIsSaving(false);
+      const target = event.target;
+      if (target instanceof Node && !userMenuRef.current.contains(target)) {
+        setIsUserMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
+
+  const userDisplayData = useMemo(() => {
+    const fullName = [user?.profile?.firstName, user?.profile?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    return {
+      name: fullName || MOCK_USER_PROFILE.name,
+      email: user?.email || MOCK_USER_PROFILE.email,
+      avatar: MOCK_USER_PROFILE.avatar,
+    };
+  }, [user]);
+
+  const centerLinks = isAuthenticated
+    ? NAV_LINKS.filter((item) => item.href !== "/login" && item.href !== "/register")
+    : [];
+  const canSeeDashboard = isAuthenticated && (user?.role === "admin" || user?.role === "super_admin");
+  const displayCenterLinks = [...centerLinks];
+
+  if (canSeeDashboard && !displayCenterLinks.some((item) => item.href === "/dashboard")) {
+    const contactIndex = displayCenterLinks.findIndex((item) => item.href === "/contact");
+    const dashboardLink = { href: "/dashboard", label: "Dashboard" };
+
+    if (contactIndex >= 0) {
+      displayCenterLinks.splice(contactIndex + 1, 0, dashboardLink);
+    } else {
+      displayCenterLinks.push(dashboardLink);
     }
   }
 
-  const centerLinks = NAV_LINKS.filter(
-    (item) => item.href !== "/login" && item.href !== "/register",
-  );
-
   return (
-    <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgb(15_23_42_/_0.84)] backdrop-blur-md">
-      <div className={`${CONTAINER_CLASS} py-3`}>
-        <div className="flex min-h-[68px] items-center gap-4 rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(30,41,59,0.96),rgba(15,23,42,0.92))] px-4 shadow-[0_18px_40px_-28px_rgba(2,8,23,0.95)] sm:px-5 lg:px-6">
-          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
-            <Link href="/" className="flex items-center gap-3 rounded-full pr-1">
-              <div className="relative h-12 w-12 overflow-hidden rounded-full border border-white/15 shadow-[0_12px_28px_-18px_rgba(2,8,23,0.9)]">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white/20 backdrop-blur-xl" : "bg-white/10 backdrop-blur-lg"
+      }`}
+    >
+      <div className={`${CONTAINER_CLASS} py-2`}>
+        <div
+          dir="ltr"
+          className={`flex min-h-[68px] items-center gap-5 rounded-2xl border px-4 shadow-[0_10px_24px_rgba(15,23,42,0.12)] backdrop-blur-md transition-all duration-300 sm:px-5 lg:px-6 ${
+            isScrolled ? "border-white/35 bg-white/22" : "border-white/30 bg-white/10"
+          }`}
+        >
+          <div className="order-first flex shrink-0 items-center gap-3 sm:gap-4">
+            <Link href="/" dir="ltr" className="flex items-center gap-3 rounded-full pl-1">
+              <div className="relative h-12 w-12 overflow-hidden rounded-full border border-[var(--border)] shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
                 <Image
                   src="/images/logo.jpg"
                   alt="Waleed Zbady"
@@ -128,65 +118,56 @@ export function Navbar() {
                   priority
                 />
               </div>
-              <div className="min-w-[92px] text-right leading-tight">
-                <p className="text-[1.08rem] font-black text-sky-400">
-                  وليد زبادي
+              <div className="min-w-[115px] text-left leading-tight">
+                <p className="text-[1.08rem] font-black text-[var(--primary)]">
+                  Waleed Zbady
                 </p>
               </div>
-            </Link>
-
-            <Link href="/dashboard" className="hidden lg:inline-flex">
-              <span className="rounded-full border border-sky-400/25 bg-sky-400/10 px-4 py-2 text-sm font-semibold text-sky-300 transition hover:border-sky-300/50 hover:bg-sky-400/15 hover:text-white">
-                Dashboard
-              </span>
             </Link>
           </div>
 
           <div className="flex flex-1 items-center justify-center">
-            <nav className="hidden items-center gap-1 rounded-full border border-white/8 bg-white/[0.03] p-1.5 lg:flex">
-              {centerLinks.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-full px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/6 hover:text-white"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            {displayCenterLinks.length ? (
+              <nav dir="rtl" className="hidden items-center gap-1 rounded-full border border-white/40 bg-white/25 p-1.5 shadow-[0_8px_20px_rgba(79,142,247,0.12)] backdrop-blur-md lg:flex">
+                {displayCenterLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-300 hover:bg-white/70 hover:text-[var(--primary)]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            ) : null}
           </div>
 
-          <div className="hidden min-w-[220px] items-center justify-end gap-2 md:flex">
+          <div dir="rtl" className="order-last flex min-w-[220px] items-center justify-end gap-2">
             {isAuthenticated ? (
               <>
-                <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-slate-300 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.04)] hover:bg-white/[0.08] hover:text-white">
+                <UserMenu
+                  userData={userDisplayData}
+                  isOpen={isUserMenuOpen}
+                  onToggle={() => setIsUserMenuOpen((current) => !current)}
+                  onClose={() => setIsUserMenuOpen(false)}
+                  onLogout={logout}
+                  menuRef={userMenuRef}
+                />
+                <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/45 bg-white/22 text-[var(--text-secondary)] backdrop-blur-md transition-all duration-300 hover:bg-white/38 hover:text-[var(--primary)]">
                   <BellIcon />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsProfileOpen(true)}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-slate-300 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.04)] hover:bg-white/[0.08] hover:text-white"
-                >
-                  <UserIcon />
-                </button>
-                <button
-                  onClick={logout}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 hover:bg-white/[0.08] hover:text-white"
-                >
-                  Logout
                 </button>
               </>
             ) : (
               <div className="flex items-center gap-2">
                 <Link
                   href="/register"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.08] hover:text-white"
+                  className="rounded-full border border-white/45 bg-white/22 px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] backdrop-blur-md transition-all duration-300 hover:bg-white/38 hover:text-[var(--primary)] md:px-4 md:py-2.5 md:text-sm"
                 >
                   انشاء حساب
                 </Link>
                 <Link
                   href="/login"
-                  className="rounded-full border border-sky-400/25 bg-sky-400/10 px-4 py-2.5 text-sm font-semibold text-sky-300 transition hover:border-sky-300/50 hover:bg-sky-400/15 hover:text-white"
+                  className="rounded-xl border border-[var(--primary)] bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white transition-all duration-300 hover:bg-[var(--primary-hover)] md:px-4 md:py-2.5 md:text-sm"
                 >
                   تسجيل الدخول
                 </Link>
@@ -195,59 +176,6 @@ export function Navbar() {
           </div>
         </div>
       </div>
-
-      <Modal
-        open={isProfileOpen}
-        title="Profile"
-        description="Review and update your account info."
-        onClose={() => setIsProfileOpen(false)}
-      >
-        <div className="space-y-4">
-          <Input
-            label="Email"
-            type="email"
-            value={profileForm.email}
-            onChange={(event) =>
-              setProfileForm((current) => ({ ...current, email: event.target.value }))
-            }
-          />
-
-          <Input
-            label="First name"
-            value={profileForm.firstName}
-            onChange={(event) =>
-              setProfileForm((current) => ({ ...current, firstName: event.target.value }))
-            }
-            disabled={!hasEditableProfile}
-            hint={
-              hasEditableProfile
-                ? undefined
-                : "Name editing is available only for accounts with a profile record"
-            }
-          />
-
-          <Input
-            label="Last name"
-            value={profileForm.lastName}
-            onChange={(event) =>
-              setProfileForm((current) => ({ ...current, lastName: event.target.value }))
-            }
-            disabled={!hasEditableProfile}
-          />
-
-          {saveError ? <p className="text-sm text-rose-300">{saveError}</p> : null}
-          {saveSuccess ? <p className="text-sm text-emerald-300">{saveSuccess}</p> : null}
-
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setIsProfileOpen(false)}>
-              Close
-            </Button>
-            <Button onClick={handleSaveProfile} disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save changes"}
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </header>
   );
 }

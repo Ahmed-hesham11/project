@@ -33,7 +33,7 @@ function formatDateInput(date: Date) {
 }
 
 function MetricIcon({ type }: { type: MetricCard["icon"] }) {
-  const common = "h-6 w-6 text-white";
+  const common = "h-6 w-6 text-[var(--text-main)]";
 
   if (type === "courses") {
     return (
@@ -82,7 +82,7 @@ function MetricIcon({ type }: { type: MetricCard["icon"] }) {
 
 function CalendarIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-sky-300" stroke="currentColor" strokeWidth="1.8">
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-[var(--primary-light)]" stroke="currentColor" strokeWidth="1.8">
       <path d="M7 3.5v3M17 3.5v3M4.5 8.5h15" strokeLinecap="round" />
       <rect x="4" y="5.5" width="16" height="14" rx="3" />
     </svg>
@@ -108,13 +108,18 @@ export function AdminDashboardClient() {
     if (!token) return;
     (async () => {
       try {
+        console.log("[AdminDashboardClient] Fetching metrics with date range:", {
+          fromDate,
+          toDate,
+        });
         const response = await getAdminMetrics(token);
         setMetrics(response);
       } catch (error) {
+        console.error("[AdminDashboardClient] Error loading metrics:", error);
         setMetricsError(error instanceof Error ? error.message : "Failed to load metrics");
       }
     })();
-  }, [token]);
+  }, [token, fromDate, toDate]);
 
   const metricCards: MetricCard[] = [
     {
@@ -122,8 +127,8 @@ export function AdminDashboardClient() {
       value: String(metrics?.courseCount ?? 0),
       delta: "+100%",
       deltaTone: "positive",
-      accentClass: "text-indigo-300",
-      iconWrapClass: "border-indigo-400/20 bg-indigo-400/14",
+      accentClass: "text-[var(--primary-light)]",
+      iconWrapClass: "border-[var(--primary-light)] bg-[var(--primary)]",
       glowClass: "from-indigo-500/20 via-sky-400/10 to-transparent",
       icon: "courses",
     },
@@ -132,8 +137,8 @@ export function AdminDashboardClient() {
       value: String(metrics?.studentsCount ?? 0),
       delta: "+12.4%",
       deltaTone: "positive",
-      accentClass: "text-sky-300",
-      iconWrapClass: "border-sky-400/20 bg-sky-400/14",
+      accentClass: "text-[var(--primary-light)]",
+      iconWrapClass: "border-[var(--primary-light)] bg-[var(--primary)]",
       glowClass: "from-sky-500/20 via-cyan-400/10 to-transparent",
       icon: "students",
     },
@@ -141,9 +146,9 @@ export function AdminDashboardClient() {
       title: "Needs Follow-up",
       value: "0",
       deltaTone: "neutral",
-      accentClass: "text-rose-300",
-      iconWrapClass: "border-rose-400/20 bg-rose-400/14",
-      glowClass: "from-rose-500/20 via-orange-300/10 to-transparent",
+      accentClass: "text-rose-600",
+      iconWrapClass: "border-rose-200 bg-rose-50",
+      glowClass: "from-rose-100 via-white to-transparent",
       icon: "alerts",
     },
     {
@@ -151,9 +156,9 @@ export function AdminDashboardClient() {
       value: formatCurrency(metrics?.totalRevenue ?? 0),
       delta: "+18.6%",
       deltaTone: "positive",
-      accentClass: "text-emerald-300",
-      iconWrapClass: "border-emerald-400/20 bg-emerald-400/14",
-      glowClass: "from-emerald-500/20 via-cyan-400/10 to-transparent",
+      accentClass: "text-emerald-600",
+      iconWrapClass: "border-sky-200 bg-sky-50",
+      glowClass: "from-sky-100 via-white to-transparent",
       icon: "revenue",
     },
     {
@@ -161,18 +166,15 @@ export function AdminDashboardClient() {
       value: "-",
       delta: `${metrics?.enrollmentsCount ?? 0} enrollments`,
       deltaTone: "neutral",
-      accentClass: "text-violet-300",
-      iconWrapClass: "border-violet-400/20 bg-violet-400/14",
-      glowClass: "from-violet-500/20 via-indigo-400/10 to-transparent",
+      accentClass: "text-[var(--accent)]",
+      iconWrapClass: "border-sky-200 bg-[var(--primary-soft)]",
+      glowClass: "from-sky-100 via-white to-transparent",
       icon: "content",
     },
   ];
 
   const revenueByMonth = metrics?.revenueByMonth ?? [];
   const maxRevenue = Math.max(1, ...revenueByMonth.map((item) => item.revenue));
-  const firstRevenue = revenueByMonth[0]?.revenue ?? 0;
-  const latestRevenue = revenueByMonth[revenueByMonth.length - 1]?.revenue ?? 0;
-  const revenueGrowth = firstRevenue ? Math.round(((latestRevenue - firstRevenue) / firstRevenue) * 100) : 0;
 
   function applyQuickRange(range: string) {
     const endDate = new Date(toDate);
@@ -206,33 +208,33 @@ export function AdminDashboardClient() {
       {metricsError ? (
         <ErrorState title="Dashboard metrics unavailable" description={metricsError} />
       ) : null}
-      <div className="dashboard-panel flex flex-col gap-4 rounded-[30px] border border-white/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.88),rgba(30,41,59,0.8),rgba(15,23,42,0.88))] p-5 shadow-[0_24px_50px_-30px_rgba(2,8,23,0.8)] backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
+      <div className="dashboard-panel flex flex-col gap-4 rounded-[30px] border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)] lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <span className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">
+          <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
             Date Range
           </span>
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex min-w-[160px] items-center gap-3 rounded-2xl border border-white/10 bg-white/6 px-4 py-3 shadow-[0_12px_24px_-18px_rgba(14,165,233,0.2)]">
+            <div className="flex min-w-[160px] items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] px-4 py-3 shadow-[0_12px_24px_-18px_rgba(14,165,233,0.2)]">
               <CalendarIcon />
               <div className="flex-1 text-left">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
                   From
                 </p>
                 <input
                   type="date"
                   value={fromDate}
                   onChange={(event) => setFromDate(event.target.value)}
-                  className="mt-1 w-full bg-transparent text-lg font-semibold text-white outline-none"
+                  className="mt-1 w-full bg-transparent text-lg font-semibold text-[var(--text-main)] outline-none"
                 />
               </div>
             </div>
 
-            <span className="px-1 text-xl text-sky-300">←</span>
+            <span className="px-1 text-xl text-[var(--primary-light)]">←</span>
 
-            <div className="flex min-w-[160px] items-center gap-3 rounded-2xl border border-white/10 bg-white/6 px-4 py-3 shadow-[0_12px_24px_-18px_rgba(79,70,229,0.22)]">
+            <div className="flex min-w-[160px] items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] px-4 py-3 shadow-[0_12px_24px_-18px_rgba(79,70,229,0.22)]">
               <CalendarIcon />
               <div className="flex-1 text-left">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
                   To
                 </p>
                 <input
@@ -240,7 +242,7 @@ export function AdminDashboardClient() {
                   value={toDate}
                   min={fromDate}
                   onChange={(event) => setToDate(event.target.value)}
-                  className="mt-1 w-full bg-transparent text-lg font-semibold text-white outline-none"
+                  className="mt-1 w-full bg-transparent text-lg font-semibold text-[var(--text-main)] outline-none"
                 />
               </div>
             </div>
@@ -255,8 +257,8 @@ export function AdminDashboardClient() {
               onClick={() => applyQuickRange(range)}
               className={`rounded-2xl border px-4 py-2.5 text-sm font-semibold transition ${
                 activeRange === range
-                  ? "border-transparent bg-[linear-gradient(135deg,var(--primary),var(--secondary))] text-white shadow-[0_18px_32px_-18px_rgba(79,70,229,0.45)]"
-                  : "border-white/10 bg-white/6 text-slate-300 hover:-translate-y-0.5 hover:border-sky-300/30 hover:text-white"
+                  ? "border-transparent bg-[linear-gradient(135deg,var(--primary),var(--accent))] text-white shadow-[0_10px_24px_rgba(0,0,0,0.08)]"
+                  : "border-[var(--border)] bg-[var(--bg-section)] text-[var(--text-secondary)] hover:-translate-y-0.5 hover:border-[var(--primary-light)] hover:bg-[var(--primary-soft)] hover:text-[var(--text-main)]"
               }`}
             >
               {range}
@@ -269,7 +271,7 @@ export function AdminDashboardClient() {
         {metricCards.map((metric, index) => (
           <div
             key={metric.title}
-            className="dashboard-card group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.92),rgba(30,41,59,0.82))] p-7 shadow-[0_24px_50px_-32px_rgba(2,8,23,0.82)]"
+            className="dashboard-card group relative overflow-hidden rounded-[30px] border border-[var(--border)] bg-[var(--bg-card)] p-7 shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
             style={{ animationDelay: `${index * 90}ms` }}
           >
             <div className={`absolute inset-x-0 top-0 h-28 bg-gradient-to-br ${metric.glowClass}`} />
@@ -281,10 +283,10 @@ export function AdminDashboardClient() {
                 <span
                   className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${
                     metric.deltaTone === "positive"
-                      ? "bg-emerald-400/12 text-emerald-300"
+                      ? "bg-sky-50 text-emerald-600"
                       : metric.deltaTone === "negative"
-                        ? "bg-rose-400/12 text-rose-300"
-                        : "bg-white/8 text-slate-300"
+                        ? "bg-rose-50 text-rose-600"
+                        : "bg-[var(--bg-secondary)] text-[var(--text-secondary)]"
                   }`}
                 >
                   {metric.delta}
@@ -292,14 +294,14 @@ export function AdminDashboardClient() {
               ) : null}
             </div>
 
-            <p className="relative mt-8 text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
+            <p className="relative mt-8 text-sm font-semibold uppercase tracking-[0.24em] text-[var(--text-secondary)]">
               {metric.title}
             </p>
             <p className={`relative mt-4 text-5xl font-black tracking-tight ${metric.accentClass}`}>
               {metric.value}
             </p>
 
-            <div className="relative mt-8 flex items-center gap-2 text-sky-300/50">
+            <div className="relative mt-8 flex items-center gap-2 text-[var(--primary-light)]/50">
               <span className="h-px flex-1 bg-current opacity-60" />
               <span className="h-2 w-8 rounded-full border border-current opacity-60" />
               <span className="h-px flex-1 bg-current opacity-60" />
@@ -308,26 +310,26 @@ export function AdminDashboardClient() {
         ))}
       </div>
 
-      <div className="dashboard-panel rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.92),rgba(17,24,39,0.84))] p-7 shadow-[0_24px_48px_-30px_rgba(2,8,23,0.82)]">
+      <div className="dashboard-panel rounded-[32px] border border-[var(--border)] bg-[var(--bg-card)] p-7 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <h2 className="text-3xl font-semibold text-white">
+            <h2 className="text-3xl font-semibold text-[var(--text-main)]">
               Monthly Revenue Comparison
             </h2>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
               Track how revenue changes across the latest months and compare momentum over time.
             </p>
           </div>
         </div>
 
-        <div className="dashboard-card mt-10 rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(30,41,59,0.74))] p-6 shadow-[0_18px_34px_-28px_rgba(2,8,23,0.5)]">
-          <div className="mb-6 flex items-center justify-between text-sm text-slate-300">
+        <div className="dashboard-card mt-10 rounded-[30px] border border-[var(--border)] bg-[var(--bg-section)] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+          <div className="mb-6 flex items-center justify-between text-sm text-[var(--text-secondary)]">
             <span>Revenue by month</span>
             <span>Last {revenueByMonth.length || 6} months</span>
           </div>
 
           <div className="grid h-[360px] grid-cols-[64px_1fr] gap-4">
-            <div className="flex h-full flex-col justify-between pb-12 text-xs text-slate-500">
+            <div className="flex h-full flex-col justify-between pb-12 text-xs text-[var(--text-secondary)]">
               <span>{formatCurrency(maxRevenue)}</span>
               <span>{formatCurrency(Math.round(maxRevenue * 0.75))}</span>
               <span>{formatCurrency(Math.round(maxRevenue * 0.5))}</span>
@@ -335,17 +337,17 @@ export function AdminDashboardClient() {
               <span>{formatCurrency(0)}</span>
             </div>
 
-            <div className="relative rounded-[26px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] px-4 pt-5 pb-12">
+            <div className="relative rounded-[26px] border border-[var(--border)] bg-[var(--bg-card)] px-4 pt-5 pb-12">
               <div className="absolute inset-x-4 top-5 bottom-12 flex flex-col justify-between">
                 {[0, 1, 2, 3, 4].map((line) => (
                   <span
                     key={line}
-                    className="block border-t border-dashed border-white/8"
+                    className="block border-t border-dashed border-[var(--border)]"
                   />
                 ))}
               </div>
 
-              <div className="absolute inset-x-4 bottom-12 border-t border-white/10" />
+              <div className="absolute inset-x-4 bottom-12 border-t border-[var(--border)]" />
 
               <div className="relative flex h-full items-end justify-between gap-4">
                 {revenueByMonth.map((item, index) => {
@@ -358,16 +360,16 @@ export function AdminDashboardClient() {
                       style={{ animationDelay: `${200 + index * 80}ms` }}
                     >
                       <div className="group flex h-full w-full flex-col items-center justify-end">
-                        <div className="mb-3 rounded-full border border-white/10 bg-slate-950/70 px-3 py-1 text-center text-xs font-medium text-slate-200 opacity-0 transition group-hover:opacity-100">
+                        <div className="mb-3 rounded-full border border-[var(--border)] bg-[var(--bg-secondary)] px-3 py-1 text-center text-xs font-medium text-[var(--text-secondary)] opacity-0 transition group-hover:opacity-100">
                           {formatCurrency(item.revenue)}
                         </div>
                         <div className="relative flex h-full w-full items-end justify-center">
                           <div
-                            className="w-full max-w-[64px] rounded-t-[20px] rounded-b-[6px] bg-[linear-gradient(180deg,rgba(34,211,238,0.98),rgba(79,70,229,0.94))] shadow-[0_20px_40px_-20px_rgba(34,211,238,0.55)] transition duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_26px_46px_-18px_rgba(79,70,229,0.55)]"
+                            className="w-full max-w-[64px] rounded-t-[20px] rounded-b-[6px] bg-[linear-gradient(180deg,var(--accent),var(--primary))] shadow-[0_10px_24px_rgba(0,0,0,0.08)] transition duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_14px_28px_rgba(0,0,0,0.1)]"
                             style={{ height: barHeight }}
                           />
                         </div>
-                        <div className="pt-4 text-center text-sm font-semibold text-slate-300">
+                        <div className="pt-4 text-center text-sm font-semibold text-[var(--text-secondary)]">
                           {item.month}
                         </div>
                       </div>

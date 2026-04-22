@@ -16,9 +16,9 @@ interface CourseTableProps {
 }
 
 const levelLabels = {
-  Beginner: "1st Secondary",
-  Intermediate: "2nd Secondary",
-  Advanced: "3rd Secondary",
+  Beginner: "الصف الأول الثانوي",
+  Intermediate: "الصف الثاني الثانوي",
+  Advanced: "الصف الثالث الثانوي",
 } as const;
 
 export function CourseTable({
@@ -29,11 +29,11 @@ export function CourseTable({
   onDelete,
 }: CourseTableProps) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900/70">
+    <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-sm">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200/70 text-sm dark:divide-white/10">
-          <thead className="bg-slate-50/80 dark:bg-slate-950/40">
-            <tr className="text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <table className="min-w-full divide-y divide-[var(--border)] text-sm">
+          <thead className="bg-[var(--bg-main)]">
+            <tr className="text-left text-xs uppercase tracking-wide text-[var(--text-muted)]">
               <th className="px-4 py-3">Course</th>
               <th className="px-4 py-3">Lessons</th>
               <th className="px-4 py-3">Students</th>
@@ -43,16 +43,16 @@ export function CourseTable({
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200/70 dark:divide-white/10">
+          <tbody className="divide-y divide-[var(--border)]">
             {courses.map((course) => {
               const active = courseStatus[course.id] ?? true;
               return (
-                <tr key={course.id} className="transition hover:bg-sky-50/60 dark:hover:bg-sky-500/5">
+                <tr key={course.id} className="transition hover:bg-[var(--hover-soft)]">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="relative h-10 w-10 overflow-hidden rounded-lg border border-slate-200 dark:border-white/10">
+                      <div className="relative h-10 w-10 overflow-hidden rounded-lg border border-[var(--border)]">
                         <Image
-                          src={course.image}
+                          src={course.image || "/images/logo.jpg"}
                           alt={course.title}
                           fill
                           sizes="40px"
@@ -60,29 +60,29 @@ export function CourseTable({
                         />
                       </div>
                       <div>
-                        <p className="font-medium text-slate-800 dark:text-slate-100">{course.title}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{course.category}</p>
+                        <p className="font-medium text-[var(--text-main)]">{course.title}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{course.category}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{course.lessonsCount}</td>
-                  <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{course.students}</td>
+                  <td className="px-4 py-4 text-[var(--text-muted)]">{course.lessonsCount}</td>
+                  <td className="px-4 py-4 text-[var(--text-muted)]">{course.students}</td>
                   <td className="px-4 py-4">
                     {course.price <= 0 ? (
-                      <Badge className="border-emerald-300/30 bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300">
+                      <Badge className="border-emerald-300/30 bg-emerald-100 text-emerald-700">
                         Free
                       </Badge>
                     ) : (
-                      <span className="font-medium text-slate-700 dark:text-slate-200">${course.price.toFixed(2)}</span>
+                      <span className="font-medium text-[var(--text-main)]">${course.price.toFixed(2)}</span>
                     )}
                   </td>
-                  <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{levelLabels[course.level]}</td>
+                  <td className="px-4 py-4 text-[var(--text-muted)]">{levelLabels[course.level]}</td>
                   <td className="px-4 py-4">
                     <button
                       type="button"
                       onClick={() => onToggleStatus(course.id)}
                       className={`relative inline-flex h-7 w-12 items-center overflow-hidden rounded-full transition ${
-                        active ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+                        active ? "bg-emerald-500" : "bg-[var(--border)]"
                       }`}
                       aria-label={`Toggle status for ${course.title}`}
                     >
@@ -98,21 +98,21 @@ export function CourseTable({
                       <ButtonLink
                         href={`/dashboard/courses/${course.id}`}
                         variant="ghost"
-                        className="h-9 px-3 text-blue-600 hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-500/10"
+                        className="h-9 px-3 text-blue-600 hover:bg-blue-50"
                       >
                         <Eye className="mr-1 h-4 w-4" /> View
                       </ButtonLink>
                       <button
                         type="button"
                         onClick={() => onEdit(course)}
-                        className="inline-flex h-9 items-center rounded-lg px-3 text-amber-600 transition hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-500/10"
+                        className="inline-flex h-9 items-center rounded-lg px-3 text-amber-600 transition hover:bg-amber-50"
                       >
                         <Pencil className="mr-1 h-4 w-4" /> Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => onDelete(course)}
-                        className="inline-flex h-9 items-center rounded-lg px-3 text-rose-600 transition hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-500/10"
+                        className="inline-flex h-9 items-center rounded-lg px-3 text-rose-600 transition hover:bg-rose-50"
                       >
                         <Trash2 className="mr-1 h-4 w-4" /> Delete
                       </button>

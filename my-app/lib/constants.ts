@@ -9,7 +9,7 @@ export const APP_CONFIG = {
 };
 
 export const CONTAINER_CLASS =
-  "mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8";
+  "ds-container";
 
 export const NAV_LINKS = [
   { href: "/", label: "الرئيسية" },

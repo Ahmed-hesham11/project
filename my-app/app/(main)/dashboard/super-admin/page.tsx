@@ -66,28 +66,28 @@ export default function SuperAdminDashboardPage() {
     <ProtectedRoute requiredRoles={["SUPER_ADMIN"]}>
       <section className="page-shell py-12">
         <div className="mx-auto w-full max-w-3xl px-5">
-          <h1 className="text-3xl font-bold text-white">Super Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-[var(--text-main)]">Super Admin Dashboard</h1>
           <form onSubmit={onSubmit} className="mt-6 space-y-3">
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Admin email"
-              className="h-11 w-full rounded bg-white/10 px-3 text-white"
+              className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-main)] px-3 text-[var(--text-main)] placeholder:text-[var(--text-muted)]"
             />
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Temporary password"
               type="password"
-              className="h-11 w-full rounded bg-white/10 px-3 text-white"
+              className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-main)] px-3 text-[var(--text-main)] placeholder:text-[var(--text-muted)]"
             />
-            <button className="rounded bg-indigo-500 px-4 py-2 text-white" type="submit">
+            <button className="rounded bg-[linear-gradient(135deg,var(--primary),var(--accent))] px-4 py-2 text-white" type="submit">
               Create Admin
             </button>
           </form>
-          {message ? <p className="mt-3 text-emerald-300">{message}</p> : null}
+          {message ? <p className="mt-3 text-emerald-600">{message}</p> : null}
           <div className="mt-8 space-y-3">
-            <h2 className="text-xl font-semibold text-white">صلاحيات الأدمن</h2>
+            <h2 className="text-xl font-semibold text-[var(--text-main)]">صلاحيات الأدمن</h2>
             {admins.map((admin) => {
               const profile = admin.adminProfile ?? {
                 canManageCourses: false,
@@ -96,7 +96,7 @@ export default function SuperAdminDashboardPage() {
                 canManagePayments: false,
               };
               return (
-                <div key={admin.id} className="rounded border border-white/10 p-3 text-slate-200">
+                <div key={admin.id} className="rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] p-3 text-[var(--text-main)]">
                   <p className="font-semibold">{admin.email}</p>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     {([

@@ -2,6 +2,7 @@ export interface CourseLesson {
   id: string;
   title: string;
   duration: string;
+  videoUrl?: string;
   locked?: boolean;
 }
 

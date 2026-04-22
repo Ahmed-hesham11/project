@@ -39,20 +39,20 @@ export function Modal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,23,42,0.12)] p-4 backdrop-blur-sm">
       <div
-        className="w-full max-w-lg rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(30,41,59,0.92))] p-6 shadow-2xl"
+        className="w-full max-w-lg rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 id="modal-title" className="text-xl font-semibold text-white">
+            <h2 id="modal-title" className="text-xl font-semibold text-[var(--text-main)]">
               {title}
             </h2>
             {description ? (
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-[var(--text-muted)]">
                 {description}
               </p>
             ) : null}

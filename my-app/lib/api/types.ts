@@ -1,6 +1,6 @@
 export interface AuthUser {
   id: string;
-  email: string;
+  studentPhone: string;
   role: "USER" | "ADMIN" | "SUPER_ADMIN";
   adminProfile?: {
     canManageCourses: boolean;
@@ -77,4 +77,5 @@ export interface UiStudent {
   email: string;
   completionRate: number;
   enrolledCourseIds: string[];
+  enabled?: boolean;
 }

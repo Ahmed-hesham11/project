@@ -11,18 +11,25 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#4F46E5",
-          hover: "#4338CA",
-          light: "rgba(79, 70, 229, 0.1)",
+          DEFAULT: "#4F8EF7",
+          hover: "#3B82F6",
+          light: "#A7C8FF",
         },
         secondary: {
-          DEFAULT: "#06B6D4",
-          hover: "#0891B2",
-          light: "rgba(6, 182, 212, 0.1)",
+          DEFAULT: "#6FA9FF",
+          hover: "#4F8EF7",
+          light: "#DDEBFF",
         },
-        accent: {
-          DEFAULT: "#22C55E",
-          light: "rgba(34, 197, 94, 0.1)",
+        light: {
+          DEFAULT: "#A7C8FF",
+        },
+        text: {
+          dark: "#1F2937",
+          gray: "#6B7280",
+        },
+        surface: {
+          DEFAULT: "#FFFFFF",
+          subtle: "#F9FAFB",
         },
       },
       fontFamily: {

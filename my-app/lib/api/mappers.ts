@@ -11,22 +11,26 @@ export function mapCourse(apiCourse: CourseApiItem): Course {
   const tags = Array.isArray(apiCourse.tags) ? apiCourse.tags : [];
   const modules = Array.isArray(apiCourse.modules) ? apiCourse.modules : [];
   const reviews = Array.isArray(apiCourse.reviews) ? apiCourse.reviews : [];
+  const normalizedLevel =
+    apiCourse.level && apiCourse.level in levelMap
+      ? levelMap[apiCourse.level]
+      : "Beginner";
 
   return {
     id: apiCourse.id,
-    slug: apiCourse.slug,
-    title: apiCourse.title,
-    tagline: apiCourse.tagline,
-    description: apiCourse.description,
-    category: apiCourse.category,
-    level: levelMap[apiCourse.level],
-    duration: apiCourse.duration,
-    lessonsCount: apiCourse.lessonsCount,
-    students: apiCourse.students,
-    rating: apiCourse.rating,
+    slug: apiCourse.slug ?? apiCourse.id,
+    title: apiCourse.title ?? "Untitled Course",
+    tagline: apiCourse.tagline ?? apiCourse.description ?? "",
+    description: apiCourse.description ?? apiCourse.tagline ?? "",
+    category: apiCourse.category ?? "General",
+    level: normalizedLevel,
+    duration: apiCourse.duration ?? "0h",
+    lessonsCount: apiCourse.lessonsCount ?? modules.reduce((sum, module) => sum + (module.lessons?.length ?? 0), 0),
+    students: apiCourse.students ?? 0,
+    rating: apiCourse.rating ?? 0,
     price: Number(apiCourse.price),
-    image: apiCourse.image,
-    mentorId: apiCourse.mentorId,
+    image: apiCourse.image ?? "/images/logo.jpg",
+    mentorId: apiCourse.mentorId ?? "mentor-waleed",
     featured: apiCourse.featured,
     tags: tags.map((tag) => tag.name),
     modules: modules.map((module) => ({
@@ -35,7 +39,7 @@ export function mapCourse(apiCourse: CourseApiItem): Course {
       lessons: (module.lessons ?? []).map((lesson) => ({
         id: lesson.id,
         title: lesson.title,
-        duration: lesson.duration,
+        duration: lesson.duration ?? "0m",
         locked: lesson.locked ?? false,
       })),
     })),

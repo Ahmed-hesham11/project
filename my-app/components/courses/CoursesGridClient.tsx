@@ -27,7 +27,13 @@ export function CoursesGridClient({ courses }: CoursesGridClientProps) {
       try {
         const enrollments = await getMyEnrollments(token);
         if (cancelled) return;
-        setEnrolledCourseIds(new Set(enrollments.map((item) => item.courseId)));
+        const courseIds = new Set<string>();
+        enrollments.forEach((item) => {
+          if (item) {
+            courseIds.add(item.courseId);
+          }
+        });
+        setEnrolledCourseIds(courseIds);
       } catch {
         if (!cancelled) {
           setEnrolledCourseIds(new Set());

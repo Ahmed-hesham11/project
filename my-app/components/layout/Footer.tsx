@@ -1,104 +1,47 @@
-import Link from "next/link";
+function FacebookIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
+      <path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.6 1.6-1.6h1.3V4.8c-.2 0-1-.1-2-.1-2.1 0-3.5 1.3-3.5 3.7V11H8.5v3h2.4v7h2.6Z" />
+    </svg>
+  );
+}
 
-import { CONTAINER_CLASS } from "@/lib/constants";
-
-const examLinks = [
-  { href: "/login", label: "امتحانات سابقة" },
-  { href: "/courses", label: "نماذج ومراجعات" },
-  { href: "/register", label: "أنشئ حسابك" },
-];
-
-const contactLinks = [
-  { href: "/dashboard", label: "لوحة التحكم" },
-  { href: "/login", label: "الدخول للحساب" },
-  { href: "/register", label: "الدعم والاشتراك" },
-];
+function YoutubeIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
+      <path d="M21.2 8.1a2.9 2.9 0 0 0-2-2.1C17.4 5.5 12 5.5 12 5.5s-5.4 0-7.2.5a2.9 2.9 0 0 0-2 2.1c-.5 1.9-.5 3.9-.5 3.9s0 2 .5 3.9a2.9 2.9 0 0 0 2 2.1c1.8.5 7.2.5 7.2.5s5.4 0 7.2-.5a2.9 2.9 0 0 0 2-2.1c.5-1.9.5-3.9.5-3.9s0-2-.5-3.9ZM10 15.2V8.8l5.2 3.2L10 15.2Z" />
+    </svg>
+  );
+}
 
 export function Footer() {
-  const quickLinks = [
-    { href: "/", label: "الرئيسية" },
-    { href: "/courses", label: "الكورسات" },
-    { href: "/dashboard", label: "Dashboard" },
-  ];
-
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(30,41,59,0.98))] text-white">
-      <div className="absolute inset-x-0 top-0 h-36 bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.28),transparent_36%),radial-gradient(circle_at_top_right,rgba(6,182,212,0.22),transparent_30%)]" />
-      <div className={`${CONTAINER_CLASS} relative py-12 md:py-14`}>
-        <div className="grid gap-8 lg:grid-cols-[1.25fr_0.8fr_0.8fr_1fr]">
-          <div className="text-right">
-            <div className="flex items-start justify-end gap-3">
-              <div>
-                <p className="font-display text-[1.55rem] font-bold text-white">
-                  منصة وليد زبادي
-                </p>
-                <p className="mt-3 max-w-[320px] text-base leading-8 text-slate-300">
-                  منصة متخصصة في تعليم الرياضيات للمرحلة الثانوية بتجربة أوضح،
-                  أسرع، وأكثر احترافية.
-                </p>
-              </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[linear-gradient(135deg,var(--primary),var(--secondary))] text-lg font-black text-white shadow-[0_18px_34px_-18px_rgba(79,70,229,0.44)]">
-                و
-              </div>
-            </div>
-          </div>
-
-          <div className="text-right">
-            <h3 className="text-[1.2rem] font-bold text-white">
-              روابط سريعة
-            </h3>
-            <div className="mt-4 space-y-2.5">
-              {quickLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="block text-base text-slate-300 transition hover:text-sky-300"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="text-right">
-            <h3 className="text-[1.2rem] font-bold text-white">
-              التعلّم
-            </h3>
-            <div className="mt-4 space-y-2.5">
-              {examLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="block text-base text-slate-300 transition hover:text-sky-300"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="text-right">
-            <h3 className="text-[1.2rem] font-bold text-white">
-              تواصل وخدمات
-            </h3>
-            <div className="mt-4 space-y-2.5">
-              {contactLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="block text-base text-slate-300 transition hover:text-sky-300"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
+    <footer className="bg-[linear-gradient(180deg,#ffffff_0%,#dff3ff_35%,#2563eb_100%)]">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-center sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3" dir="rtl">
+          <a
+            href="https://www.facebook.com/1waleedzabady"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Facebook"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm transition-all duration-300 hover:bg-blue-100 hover:-translate-y-0.5"
+          >
+            <FacebookIcon />
+          </a>
+          <a
+            href="https://www.youtube.com/@1waleedzabady/videos"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="YouTube"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-red-600 shadow-sm transition-all duration-300 hover:bg-red-100 hover:-translate-y-0.5"
+          >
+            <YoutubeIcon />
+          </a>
         </div>
 
-        <div className="mt-10 h-px bg-white/10" />
-        <div className="pt-6 text-center text-base text-slate-300 md:text-lg">
-          جميع الحقوق محفوظة | Waleed Zbady Mathematics Platform 2026 ©
-        </div>
+        <p className="text-sm text-white/90" dir="rtl">
+          © 2026 منصة تعليم الرياضيات - جميع الحقوق محفوظة
+        </p>
       </div>
     </footer>
   );

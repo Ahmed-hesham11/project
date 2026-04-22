@@ -20,9 +20,14 @@ export function MyCoursesClient() {
     (async () => {
       try {
         const enrollments = await getMyEnrollments(token);
-        setCourses(enrollments.map((item) => item.course));
+        const validCourses = enrollments
+          .filter((item): item is NonNullable<typeof item> => item !== null)
+          .map((item) => item.course);
+        setCourses(validCourses);
       } catch (fetchError) {
-        setError(fetchError instanceof Error ? fetchError.message : "Failed to load your courses");
+        console.error("[MyCoursesClient] Error:", fetchError);
+        const errorMessage = fetchError instanceof Error ? fetchError.message : "Failed to load your courses";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -31,30 +36,41 @@ export function MyCoursesClient() {
 
   return (
     <ProtectedRoute>
-      <section className="page-shell py-16 sm:py-20">
+      <section className="page-shell py-8 sm:py-10">
         <div className="mx-auto w-full max-w-[1400px] px-5 lg:px-8 xl:px-10">
-          <h1 className="text-4xl font-bold text-white">My Courses</h1>
-          {loading ? <p className="mt-6 text-slate-300">Loading your courses...</p> : null}
+          <div className="section-reveal rounded-2xl border border-white/40 bg-white/30 p-6 text-right shadow-sm backdrop-blur-sm">
+            <span className="inline-flex rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm">
+              كورساتي
+            </span>
+            <h1 className="mt-4 font-display text-3xl font-bold leading-normal text-[var(--text-primary)] md:text-5xl">
+              الكورسات التي اشتركت بها
+            </h1>
+            <p className="mt-3 text-base text-[var(--text-secondary)]">
+              شاهد دروسك وتابع التقدم في أي وقت.
+            </p>
+          </div>
+
+          {loading ? <p className="mt-6 text-[var(--text-secondary)]">جاري تحميل كورساتك...</p> : null}
           {error ? (
             <div className="mt-6">
-              <ErrorState title="Could not load courses" description={error} />
+              <ErrorState title="تعذر تحميل الكورسات" description={error} />
             </div>
           ) : null}
           {!loading && !error && !courses.length ? (
             <div className="mt-6">
               <EmptyState
-                title="No enrolled courses yet"
-                description="Browse courses and enroll in one to see it here."
+                title="لا توجد كورسات مشتركة بعد"
+                description="تصفح الكورسات واشترك في كورس ليظهر هنا."
                 actionHref="/courses"
-                actionLabel="Browse courses"
+                actionLabel="تصفح الكورسات"
               />
             </div>
           ) : null}
           {!loading && !error && courses.length ? (
-            <div className="mt-8">
+            <div className="section-reveal mt-6">
               <CourseGrid
                 courses={courses}
-                actionLabel="شاهد الان"
+                actionLabel="شاهد الآن"
                 actionHrefBuilder={(course) => `/courses/${course.id}/learn`}
                 hidePrice
               />

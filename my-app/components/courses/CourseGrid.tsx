@@ -22,16 +22,21 @@ export function CourseGrid({
   if (!courses.length) {
     return (
       <EmptyState
-        title="No courses found"
-        description="Try a different filter or add a new course to populate this grid."
-        actionHref="/register"
-        actionLabel="Browse plans"
+        title="لا توجد كورسات حالياً"
+        description="جرّب مرة أخرى بعد قليل أو أضف كورسات جديدة من لوحة التحكم."
+        actionHref="/dashboard/courses"
+        actionLabel="إدارة الكورسات"
       />
     );
   }
 
+  const gridClassName =
+    courses.length === 1
+      ? "mx-auto grid max-w-[420px] gap-6 grid-cols-1"
+      : "grid gap-6 md:grid-cols-2 xl:grid-cols-3";
+
   return (
-    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div className={gridClassName}>
       {courses.map((course, index) => (
         <div
           key={course.id}
