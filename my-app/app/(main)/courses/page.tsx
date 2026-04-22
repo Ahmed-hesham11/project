@@ -3,6 +3,8 @@ import { getCourses } from "@/lib/api/courses";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Course } from "@/types/course";
 
+export const dynamic = "force-dynamic";
+
 export default async function CoursesPage() {
   let courses: Course[] = [];
   let errorMessage: string | null = null;
