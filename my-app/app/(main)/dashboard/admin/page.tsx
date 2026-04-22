@@ -6,6 +6,48 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { createAdminCourse, deleteAdminCourse, getAdminCourses } from "@/lib/api/admin";
 import { createAssignment, createLesson, createModule, createQuiz, deleteAssignment, deleteLesson, deleteQuiz, getContentMap, getPayments, updateAssignment, updateLesson, updatePaymentStatus, updateQuiz } from "@/lib/api/lms";
 
+type SanitizedLesson = {
+  id: string;
+  title: string;
+  module: { id: string; title: string; course: { id: string; title: string } };
+  assignments: Array<{ id: string; title: string; unlocksLessonId?: string | null }>;
+  quizzes: Array<{ id: string; title: string; unlocksLessonId?: string | null }>;
+};
+
+function sanitizeLessons(
+  lessons: Array<{
+    id: string;
+    title: string | null;
+    module: { id: string; title: string | null; course: { id: string; title: string | null } };
+    assignments: Array<{ id: string; title: string | null; unlocksLessonId?: string | null }>;
+    quizzes: Array<{ id: string; title: string | null; unlocksLessonId?: string | null }>;
+  }>,
+): SanitizedLesson[] {
+  if (!lessons) return [];
+  return lessons.map((lesson) => ({
+    id: lesson.id,
+    title: lesson.title ?? "",
+    module: {
+      id: lesson.module?.id ?? "",
+      title: lesson.module?.title ?? "",
+      course: {
+        id: lesson.module?.course?.id ?? "",
+        title: lesson.module?.course?.title ?? "",
+      },
+    },
+    assignments: (lesson.assignments ?? []).map((assignment) => ({
+      id: assignment.id,
+      title: assignment.title ?? "",
+      unlocksLessonId: assignment.unlocksLessonId ?? null,
+    })),
+    quizzes: (lesson.quizzes ?? []).map((quiz) => ({
+      id: quiz.id,
+      title: quiz.title ?? "",
+      unlocksLessonId: quiz.unlocksLessonId ?? null,
+    })),
+  }));
+}
+
 export default function AdminDashboardPage() {
   const { token } = useAuth();
   const [payments, setPayments] = useState<Array<{ id: string; status: string; method: string; referenceCode: string; user: { email: string }; course: { title: string } }>>([]);
@@ -74,7 +116,7 @@ export default function AdminDashboardPage() {
       .then(([paymentsRes, coursesRes, contentRes]) => {
         setPayments(paymentsRes.payments);
         setCourses(coursesRes);
-        setContentMap(contentRes.lessons);
+        setContentMap(sanitizeLessons(contentRes.lessons));
       })
       .catch(() => undefined);
   }, [token]);
@@ -125,7 +167,7 @@ export default function AdminDashboardPage() {
     const coursesRes = await getAdminCourses(token);
     setCourses(coursesRes);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
     setMessage("تم إضافة المحاضرة");
   }
 
@@ -143,7 +185,7 @@ export default function AdminDashboardPage() {
     const coursesRes = await getAdminCourses(token);
     setCourses(coursesRes);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
     setMessage("تم إضافة موديول");
   }
 
@@ -166,7 +208,7 @@ export default function AdminDashboardPage() {
         token,
       );
       const contentRes = await getContentMap("", token);
-      setContentMap(contentRes.lessons);
+      setContentMap(sanitizeLessons(contentRes.lessons));
       setMessage("تم إضافة الواجب");
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "فشل إضافة الواجب");
@@ -196,7 +238,7 @@ export default function AdminDashboardPage() {
         token,
       );
       const contentRes = await getContentMap("", token);
-      setContentMap(contentRes.lessons);
+      setContentMap(sanitizeLessons(contentRes.lessons));
       setMessage("تم إضافة الكويز");
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "فشل إضافة الكويز");
@@ -239,7 +281,7 @@ export default function AdminDashboardPage() {
     const coursesRes = await getAdminCourses(token);
     setCourses(coursesRes);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
   }
 
   async function onPaymentStatus(paymentId: string, status: "PAID" | "FAILED") {
@@ -254,7 +296,7 @@ export default function AdminDashboardPage() {
     await deleteLesson(lessonId, token);
     const [coursesRes, contentRes] = await Promise.all([getAdminCourses(token), getContentMap("", token)]);
     setCourses(coursesRes);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
     setMessage("تم حذف المحاضرة");
   }
 
@@ -262,7 +304,7 @@ export default function AdminDashboardPage() {
     if (!token) return;
     await deleteAssignment(assignmentId, token);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
     setMessage("تم حذف الواجب");
   }
 
@@ -270,7 +312,7 @@ export default function AdminDashboardPage() {
     if (!token) return;
     await deleteQuiz(quizId, token);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
     setMessage("تم حذف الكويز");
   }
 
@@ -278,7 +320,7 @@ export default function AdminDashboardPage() {
     if (!token) return;
     await updateLesson(lessonId, { videoUrl: null }, token);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
     setMessage("تم حذف فيديو المحاضرة");
   }
 
@@ -286,14 +328,14 @@ export default function AdminDashboardPage() {
     if (!token) return;
     await updateAssignment(assignmentId, { unlocksLessonId: unlocksLessonId || null }, token);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
   }
 
   async function onRetargetQuiz(quizId: string, unlocksLessonId: string) {
     if (!token) return;
     await updateQuiz(quizId, { unlocksLessonId: unlocksLessonId || null }, token);
     const contentRes = await getContentMap("", token);
-    setContentMap(contentRes.lessons);
+    setContentMap(sanitizeLessons(contentRes.lessons));
   }
 
   const fieldClass = "h-10 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-main)] px-3 text-[var(--text-main)] placeholder:text-[var(--text-muted)]";
