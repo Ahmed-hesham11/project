@@ -1,13 +1,5 @@
-import { MathCurrentCourses } from "@/components/sections/MathCurrentCourses";
-import { MathFeatures } from "@/components/sections/MathFeatures";
-import { MathHero } from "@/components/sections/MathHero";
+import HomePage from "./(main)/page";
 
-export default function HomePage() {
-  return (
-    <>
-      <MathHero />
-      <MathFeatures />
-      <MathCurrentCourses />
-    </>
-  );
+export default function Home() {
+  return <HomePage />;
 }
