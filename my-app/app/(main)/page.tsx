@@ -10,6 +10,7 @@ export default function HomePage() {
       <MathHero />
       <MathFeatures />
       <MathCurrentCourses />
+      
     </>
   );
 }
